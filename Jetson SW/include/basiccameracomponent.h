@@ -5,6 +5,7 @@
 #include <opencv2/opencv.hpp>
 #include "threadsafequeue.h"
 #include <thread>
+#include <atomic>
 
 class BasicCameraComponent {
 public:
@@ -15,6 +16,7 @@ public:
     void startCapture();
     void stopCapture();
     void setFPS(int fps);
+    void setSource(const std::string& source);
 
 private:
     cv::VideoCapture cap;

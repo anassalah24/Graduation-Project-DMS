@@ -34,13 +34,19 @@ void BasicCameraComponent::startCapture() {
 }
 
 
+
 //stop capture and release the thread
 void BasicCameraComponent::stopCapture() {
     running = false;
+
+
+
     if (captureThread.joinable()) {
+
         captureThread.join();
     }
     if (cap.isOpened()) {
+
         cap.release();
     }
 }
@@ -51,6 +57,7 @@ void BasicCameraComponent::captureLoop() {
     fps = 60;
     //int delay = 1000 / fps;
     while (running) {
+
         // Calculate the delay based on the desired FPS
     	int delay = 1000 / (this->fps);  // Delay in milliseconds
         auto start = std::chrono::steady_clock::now();
@@ -86,7 +93,11 @@ void BasicCameraComponent::captureLoop() {
             std::this_thread::sleep_for(std::chrono::milliseconds(delay - elapsed));
         }
     }
+
+    running = false;
+
 }
+
 
 void BasicCameraComponent::setFPS(int fps) {
     this->fps = fps;
@@ -94,5 +105,16 @@ void BasicCameraComponent::setFPS(int fps) {
 }
 
 
+void BasicCameraComponent::setSource(const std::string& source) {
+    
+    stopCapture();
+    if (!cap.open(source)) {
+        std::cerr << "Failed to change source: " << source << std::endl;
+    } else {
+        startCapture();
+        std::cout << "Changed source to: " << source << std::endl;
+    }
+
+}
 
 

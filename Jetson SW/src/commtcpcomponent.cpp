@@ -117,27 +117,79 @@ void CommTCPComponent::handleFrameClient(int clientSocket) {
 
 // Handle command reception and readings data transmission to a client
 void CommTCPComponent::handleCommandClient(int clientSocket) {
-    char buffer[1024] = {0};
-    ssize_t bytesRead;
     std::vector<std::vector<float>> reading;
-    
-    while (running) {
-        if (readingsQueue.tryPop(reading) && !reading.empty()) {
-		std::vector<uint8_t> serializedData = serialize(reading);
-    		send(clientSocket, serializedData.data(), serializedData.size(), 0);        
-	}
 
-	bytesRead = recv(clientSocket, buffer, sizeof(buffer), MSG_DONTWAIT);
+    while (running) {
+        // Handle readings data transmission
+        if (readingsQueue.tryPop(reading) && !reading.empty()) {
+            std::vector<uint8_t> serializedData = serialize(reading);
+            send(clientSocket, serializedData.data(), serializedData.size(), 0);
+        }
+
+        // Handle configuration messages
+        char buffer[1024] = {0};
+        ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), MSG_DONTWAIT);
+
         if (bytesRead > 0) {
-            std::string command(buffer, bytesRead);
-            std::cout << "Received command: " << command << std::endl;
-            // Process command here and possibly send back a response
-            // This part depends on the application logic
+            const char* ptr = buffer;
+            const char* end = buffer + bytesRead;
+
+            while (ptr < end) {
+                // Read the length of the next message
+                int messageLength = 0;
+                std::memcpy(&messageLength, ptr, sizeof(int));
+                ptr += sizeof(int);
+
+                // Ensure we have enough data for the message
+                if (ptr + messageLength > end) {
+                    std::cerr << "Incomplete message received" << std::endl;
+                    break;
+                }
+
+                // Extract the message
+                std::string message(ptr, messageLength);
+                ptr += messageLength;
+
+                // Process the message
+                if (message.find("SET_FPS") != std::string::npos) {
+                    // Handle FPS configuration
+                    std::cout << "Received SET_FPS command with value: " << message.substr(8) << std::endl;
+                    std::string command = "SET_FPS:" + message.substr(8);
+                    commandsQueue.push(command);
+
+                } else if (message == "TURN_OFF") {
+                    // Handle turning off the system
+                    std::cout << "Received TURN_OFF command" << std::endl;
+                    std::string command = "TURN_OFF";
+                    commandsQueue.push(command);
+
+                } else if (message == "TURN_ON") {
+                    // Handle turning on the system
+                    std::cout << "Received TURN_ON command" << std::endl;
+                    std::string command = "TURN_ON";
+                    commandsQueue.push(command);
+
+                } else if (message.find("SET_FDT") != std::string::npos) {
+                    // Handle FDT configuration
+                    std::cout << "Received SET_FDT command with value: " << message.substr(8) << std::endl;
+                    std::string command = "SET_FDT:" + message.substr(8);
+                    commandsQueue.push(command);
+
+		} else if (message.find("SET_SOURCE") != std::string::npos) {
+                    // Handle FDT configuration
+                    std::cout << "Received SET_SOURCE command with value: " << message.substr(11) << std::endl;
+                    std::string command = "SET_SOURCE:" + message.substr(11);
+                    commandsQueue.push(command);
+                } else {
+                    // Unknown command
+                    std::cout << "Received unknown command: " << message << std::endl;
+                }
+            }
         }
     }
+
     close(clientSocket);
 }
-
 // Serialize a 2D vector of floats to a byte array
 std::vector<uint8_t> CommTCPComponent::serialize(const std::vector<std::vector<float>>& data) {
     std::vector<uint8_t> buffer;

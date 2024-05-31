@@ -48,15 +48,22 @@ void HeadPoseComponent::HeadPoseDetectionLoop() {
             cv::Mat croppedFace;
             // Assuming the face is detected and bounded by a rectangle
             cv::Rect faceRect = detectFaceRectangle(frame); // Implement this function to find the rectangle
-            if (faceRect.width > 0 && faceRect.height > 0) {
+            if (faceRect.x >= 0 && faceRect.y >= 0 &&
+                faceRect.width > 0 && faceRect.height > 0 &&
+                faceRect.x + faceRect.width <= frame.cols &&
+                faceRect.y + faceRect.height <= frame.rows) {
                 croppedFace = frame(faceRect);
-                auto readings = detectHeadPose(croppedFace);
-                framesQueue.push(frame);
-                outputQueue.push(readings);
-		if (isFirstFrame) {
+            } else {
+                croppedFace = frame; // No face detected, use the original frame
+            }
+            
+            auto readings = detectHeadPose(croppedFace);
+            framesQueue.push(frame);
+            outputQueue.push(readings);
+
+            if (isFirstFrame) {
                 inputQueue.clear(); // Clear the queue after the first frame is processed
                 isFirstFrame = false; // Update the flag so the queue won't be cleared again
-            	}
             }
         }
     }

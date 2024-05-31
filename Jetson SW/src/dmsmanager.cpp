@@ -10,7 +10,7 @@ faceDetectionComponent(cameraQueue, faceDetectionQueue, faceRectQueue, commandsQ
 drowsinessComponent(faceDetectionQueue, drowsinessDetectionQueue,commandsQueue,faultsQueue),
 headposeComponent(faceDetectionQueue, faceRectQueue, headposeDetectionQueue,framesQueue,commandsQueue,faultsQueue),
 eyegazeComponent(framesQueue, eyegazeframesQueue, eyegazeDetectionQueue,commandsQueue,faultsQueue),
-tcpComponent(tcpPort, cameraQueue, headposeDetectionQueue, commandsQueue,faultsQueue),
+tcpComponent(tcpPort, framesQueue, headposeDetectionQueue, commandsQueue,faultsQueue),
 vehicleStateManager(stateOutputQueue,commandsQueue,faultsQueue),
 postProcessingComponent(stateOutputQueue, postOutputQueue,commandsQueue,faultsQueue),
 faultManager(commandsQueue, faultsQueue),
@@ -39,10 +39,10 @@ bool DMSManager::startSystem() {
     //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
     headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
     //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
-    //tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
+    tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
     //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
     //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
-    //commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
+    commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
     //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
     return true;
 }
@@ -144,6 +144,26 @@ void DMSManager::setFaceFDT(int fdt) {
 }
 
 
+void DMSManager::setCamereSource(const std::string& source) {
+    cameraComponent.setSource(source);
+    clearQueues();
+}
+
+void DMSManager::clearQueues(){
+
+    cameraQueue.clear();
+    preprocessingQueue.clear();
+    faceDetectionQueue.clear();
+    faceRectQueue.clear();
+    drowsinessDetectionQueue.clear();
+    headposeDetectionQueue.clear();
+    eyegazeDetectionQueue.clear();
+    framesQueue.clear();
+    eyegazeframesQueue.clear();
+    tcpOutputQueue.clear();
+    stateOutputQueue.clear();
+    postOutputQueue.clear();
+}
 
 
 void DMSManager::handlecommand(std::string& command) {
@@ -169,14 +189,41 @@ void DMSManager::handlecommand(std::string& command) {
             int fdtValue = std::stoi(fdtValueStr);
             std::cout << "Setting Face Detection Threshhold to: " << fdtValue << std::endl;
 	    setFaceFDT(fdtValue);	
-        } else {
+        } 
+	else {
             std::cerr << "Invalid SETFDT command format: " << command << std::endl;
-        }
+          }
+	}
+    //setting source
+    else if (command.find("SET_SOURCE:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string sourceStr = command.substr(pos + 1);
+            if (sourceStr == "camera") {
+                sourceStr = "/dev/video0";  // or the appropriate camera source for your system
+            } else if (sourceStr.find("video:") == 0) {
+                std::string videoName = sourceStr.substr(6);  // Extract the video name after "video:"
+                sourceStr = "/home/dms/DMS/Videos/" + videoName;  // Construct the full path to the video file
+            } else {
+                std::cerr << "Invalid source value: " << sourceStr << std::endl;
+                return;
+            }
 
+            std::cout << "Setting Source to: " << sourceStr << std::endl;
+            setCamereSource(sourceStr);
+        } else {
+            std::cerr << "Invalid SET_SOURCE command format: " << command << std::endl;
+        }
+    }
     //turning off the system
-    } else if (command == "TURN_OFF") {
+     else if (command == "TURN_OFF") {
         std::cout << "Turning off..." << std::endl;
 	stopSystem();
+
+    //turning on the system
+    } else if (command == "TURN_ON") {
+        std::cout << "Turning on..." << std::endl;
+	startSystem();
 	
 
    // Handle unknown command
