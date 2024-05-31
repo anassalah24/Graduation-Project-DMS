@@ -34,7 +34,7 @@ bool DMSManager::startSystem() {
     //starting each component in its own thread
     cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
     //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
-    faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
+    //faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
     //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
     //headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
     //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread

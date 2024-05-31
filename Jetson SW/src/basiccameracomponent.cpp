@@ -61,19 +61,6 @@ void BasicCameraComponent::captureLoop() {
             break;
         }
         if (!frame.empty()) {
-
-	    // Print frame details
-            int width = frame.cols;
-            int height = frame.rows;
-            size_t totalElements = frame.total();
-            int dataTypeSize = frame.elemSize();  // Size of each element in bytes
-            size_t frameSize = totalElements * dataTypeSize;
-
-            //std::cout << "Captured Frame: " << std::endl;
-            //std::cout << "Resolution: " << width << "x" << height << std::endl;
-            //std::cout << "Size: " << frameSize << " bytes" << std::endl;
-            //std::cout << "Data type size: " << dataTypeSize << " bytes per element" << std::endl;
-
             outputQueue.push(frame);
         }
 
