@@ -60,24 +60,7 @@
       <height>671</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="cfgs_layout">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
-       </property>
-       <property name="lineWidth">
-        <number>3</number>
-       </property>
-       <property name="text">
-        <string>Configurations Here</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <layout class="QVBoxLayout" name="cfgs_layout"/>
    </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">

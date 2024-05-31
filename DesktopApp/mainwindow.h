@@ -7,6 +7,7 @@
 #include "drivermonitoringwidget.h"
 #include "systemcontrol.h"
 #include "readingswidget.h"
+#include "configswidget.h"
 #include <opencv2/opencv.hpp>
 
 namespace Ui {
@@ -27,6 +28,8 @@ private:
     DriverMonitoringWidget *driverMonitoringWidget;
     SystemControl *systemcontrol;
     ReadingsWidget *readingsWidget;
+    ConfigsWidget *configsWidget;
+
 
 };
 

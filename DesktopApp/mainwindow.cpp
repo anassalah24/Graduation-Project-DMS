@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     driverMonitoringWidget(new DriverMonitoringWidget(this)),
     systemcontrol(nullptr),
     readingsWidget(new ReadingsWidget)
-
 {
     ui->setupUi(this);
 
@@ -19,6 +18,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Create the DataHandler and connect it to the sockets from the ConnectionWidget
     dataHandler = new DataHandler(connectionWidget->getTcpSocket1(), connectionWidget->getTcpSocket2(), this);
+
+    // Create the ConfigsWidget and pass the DataHandler to it
+    configsWidget = new ConfigsWidget(dataHandler, this);
+    ui->cfgs_layout->addWidget(configsWidget);
+
 
     // Create the SystemControlWidget and pass the DataHandler to it
     systemcontrol = new SystemControl(dataHandler, this);
