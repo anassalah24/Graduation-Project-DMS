@@ -2,8 +2,8 @@
 
 
 //constructor
-FaceDetectionComponent::FaceDetectionComponent(ThreadSafeQueue<cv::Mat>& inputQueue, ThreadSafeQueue<cv::Mat>& outputQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
-: inputQueue(inputQueue), outputQueue(outputQueue),commandsQueue(commandsQueue),faultsQueue(faultsQueue), running(false) {}
+FaceDetectionComponent::FaceDetectionComponent(ThreadSafeQueue<cv::Mat>& inputQueue, ThreadSafeQueue<cv::Mat>& outputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
+: inputQueue(inputQueue), outputQueue(outputQueue), faceRectQueue(faceRectQueue), commandsQueue(commandsQueue),faultsQueue(faultsQueue), running(false) {}
 
 
 //destructor
@@ -65,7 +65,7 @@ void FaceDetectionComponent::detectionLoop() {
 }
 
 
-// Function to start the YOLO face detection and crop the first detected face
+// Function to start the YOLO face detection and send the face with max confidence
 void FaceDetectionComponent::detectFaces(cv::Mat& frame) {
     cv::Mat blob;
     try {
@@ -74,29 +74,29 @@ void FaceDetectionComponent::detectFaces(cv::Mat& frame) {
         std::vector<cv::Mat> outs;
         net.forward(outs, net.getUnconnectedOutLayersNames());
 
-        float confThreshold = static_cast<float>(this->fdt) / 100.0f;
-        bool firstFaceCropped = false; // Flag to check if the first face is cropped
-
+        float maxConf = 0;
+        cv::Rect bestFaceRect;
         for (const auto& out : outs) {
             for (int i = 0; i < out.rows; ++i) {
                 const float* detection = out.ptr<float>(i);
                 float confidence = detection[4];
-                if (confidence > confThreshold && !firstFaceCropped) {
-                    // Crop the first face and push to the queue, then break
-                    cv::Rect faceRect = getFaceRect(detection, frame);
-                    cv::Mat faceCrop = frame(faceRect);
-
-                    outputQueue.push(faceCrop); // Assuming outputQueue is thread-safe
-                    firstFaceCropped = true;
-                    break; // Stop after the first face
+                if (confidence > maxConf) {
+                    maxConf = confidence;
+                    bestFaceRect = getFaceRect(detection, frame);
                 }
             }
-            if (firstFaceCropped) break; // Break outer loop if face is already processed
         }
+
+        if (maxConf > static_cast<float>(this->fdt) / 100.0f) {
+            cv::rectangle(frame, bestFaceRect, cv::Scalar(0, 255, 0), 2);
+	    faceRectQueue.push(bestFaceRect); // Push the bounding box coordinates
+        }
+        outputQueue.push(frame); // Pass the complete frame with the bounding box
     } catch (const cv::Exception& e) {
         std::cerr << "OpenCV error: " << e.what() << std::endl;
     }
 }
+
 
 // Helper function to calculate the rectangle of the face from detection data
 cv::Rect FaceDetectionComponent::getFaceRect(const float* detection, const cv::Mat& frame) {

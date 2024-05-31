@@ -2,21 +2,22 @@
 #include <benchmark/benchmark.h>
 
 //Constructor ; passes input and ouptut queues for different component and tcp port
-DMSManager::DMSManager(ThreadSafeQueue<cv::Mat>& cameraQueue, ThreadSafeQueue<cv::Mat>& preprocessingQueue, ThreadSafeQueue<cv::Mat>& faceDetectionQueue, ThreadSafeQueue<cv::Mat>& drowsinessDetectionQueue,ThreadSafeQueue<std::string>& headposeDetectionQueue, ThreadSafeQueue<std::string>& eyegazeDetectionQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<cv::Mat>& eyegazeframesQueue, ThreadSafeQueue<cv::Mat>& tcpOutputQueue, int tcpPort , ThreadSafeQueue<CarState>& stateOutputQueue , ThreadSafeQueue<int>& postOutputQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
+DMSManager::DMSManager(ThreadSafeQueue<cv::Mat>& cameraQueue, ThreadSafeQueue<cv::Mat>& preprocessingQueue, ThreadSafeQueue<cv::Mat>& faceDetectionQueue, ThreadSafeQueue<cv::Rect>& faceRectQueue,
+ ThreadSafeQueue<cv::Mat>& drowsinessDetectionQueue,ThreadSafeQueue<std::vector<std::vector<float>>>& headposeDetectionQueue, ThreadSafeQueue<std::string>& eyegazeDetectionQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<cv::Mat>& eyegazeframesQueue, ThreadSafeQueue<cv::Mat>& tcpOutputQueue, int tcpPort , ThreadSafeQueue<CarState>& stateOutputQueue , ThreadSafeQueue<int>& postOutputQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
 :cameraComponent(cameraQueue,commandsQueue,faultsQueue),
 preprocessingComponent(cameraQueue, preprocessingQueue,commandsQueue,faultsQueue), 
-faceDetectionComponent(cameraQueue, faceDetectionQueue,commandsQueue,faultsQueue),
+faceDetectionComponent(cameraQueue, faceDetectionQueue, faceRectQueue, commandsQueue,faultsQueue),
 drowsinessComponent(faceDetectionQueue, drowsinessDetectionQueue,commandsQueue,faultsQueue),
-headposeComponent(faceDetectionQueue, headposeDetectionQueue,framesQueue,commandsQueue,faultsQueue),
+headposeComponent(faceDetectionQueue, faceRectQueue, headposeDetectionQueue,framesQueue,commandsQueue,faultsQueue),
 eyegazeComponent(framesQueue, eyegazeframesQueue, eyegazeDetectionQueue,commandsQueue,faultsQueue),
-tcpComponent(tcpPort, cameraQueue,commandsQueue,faultsQueue),
+tcpComponent(tcpPort, cameraQueue, headposeDetectionQueue, commandsQueue,faultsQueue),
 vehicleStateManager(stateOutputQueue,commandsQueue,faultsQueue),
 postProcessingComponent(stateOutputQueue, postOutputQueue,commandsQueue,faultsQueue),
 faultManager(commandsQueue, faultsQueue),
-cameraQueue(cameraQueue),preprocessingQueue(preprocessingQueue), faceDetectionQueue(faceDetectionQueue), 
+cameraQueue(cameraQueue),preprocessingQueue(preprocessingQueue), faceDetectionQueue(faceDetectionQueue), faceRectQueue(faceRectQueue),
 drowsinessDetectionQueue(drowsinessDetectionQueue),headposeDetectionQueue(headposeDetectionQueue),
 eyegazeDetectionQueue(eyegazeDetectionQueue), framesQueue(framesQueue), eyegazeframesQueue(eyegazeframesQueue),
-tcpPort(tcpPort),stateOutputQueue(stateOutputQueue),postOutputQueue(postOutputQueue),
+tcpPort(tcpPort), tcpOutputQueue(tcpOutputQueue), stateOutputQueue(stateOutputQueue),postOutputQueue(postOutputQueue),
 commandsQueue(commandsQueue),faultsQueue(faultsQueue),running(false) {}//change back the tcp queue
 
 //destructor (cleanup)
@@ -34,11 +35,11 @@ bool DMSManager::startSystem() {
     //starting each component in its own thread
     cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
     //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
-    //faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
+    faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
     //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
-    //headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
+    headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
     //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
-    tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
+    //tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
     //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
     //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
     //commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread

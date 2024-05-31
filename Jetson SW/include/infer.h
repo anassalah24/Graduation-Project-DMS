@@ -21,7 +21,7 @@ private:
     ICudaEngine* engine;
     TRTEngineSingleton() : engine(nullptr) {
         // Load TensorRT engine only once
-        engine = loadEngine("A0.engine");
+        engine = loadEngine("Ay.engine");
         if (!engine) {
             std::cerr << "Failed to load engine" << std::endl;
             // Handle error appropriately, maybe throw an exception

@@ -9,7 +9,7 @@
 
 class HeadPoseComponent {
 public:
-    HeadPoseComponent(ThreadSafeQueue<cv::Mat>& inputQueue, ThreadSafeQueue<std::string>& outputQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue);
+    HeadPoseComponent(ThreadSafeQueue<cv::Mat>& inputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue, ThreadSafeQueue<std::vector<std::vector<float>>>& outputQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue);
     ~HeadPoseComponent();
 
     bool initialize();
@@ -20,7 +20,8 @@ public:
 
 private:
     ThreadSafeQueue<cv::Mat>& inputQueue;
-    ThreadSafeQueue<std::string>& outputQueue;
+    ThreadSafeQueue<cv::Rect>& faceRectQueue;
+    ThreadSafeQueue<std::vector<std::vector<float>>>& outputQueue;
     ThreadSafeQueue<cv::Mat>& framesQueue;
     ThreadSafeQueue<std::string>& commandsQueue;
     ThreadSafeQueue<std::string>& faultsQueue;
@@ -30,7 +31,9 @@ private:
     bool running;
     
     void HeadPoseDetectionLoop();
-    void detectHeadPose(cv::Mat& frame);
+    std::vector<std::vector<float>> detectHeadPose(cv::Mat& frame);
+    cv::Rect detectFaceRectangle(const cv::Mat& frame);
+
 
     
     // members for performance metrics

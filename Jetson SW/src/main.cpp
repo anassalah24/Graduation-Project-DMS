@@ -10,9 +10,10 @@ int main() {
     // Initialize thread-safe queues needed for each component
     ThreadSafeQueue<cv::Mat> cameraQueue;
     ThreadSafeQueue<cv::Mat> preprocessingQueue;
-    ThreadSafeQueue<cv::Mat> faceDetectionQueue;
+    ThreadSafeQueue<cv::Mat> faceDetectionQueue; 
+    ThreadSafeQueue<cv::Rect> faceRectQueue;
     ThreadSafeQueue<cv::Mat> drowsinessDetectionQueue;
-    ThreadSafeQueue<std::string> headposeDetectionQueue;
+    ThreadSafeQueue<std::vector<std::vector<float>>> headposeDetectionQueue;
     ThreadSafeQueue<std::string> eyegazeDetectionQueue;
     ThreadSafeQueue<cv::Mat> framesQueue;
     ThreadSafeQueue<cv::Mat> eyegazeframesQueue;
@@ -25,7 +26,8 @@ int main() {
     int tcpPort = 12345;  // Define the TCP port for the server
 
     // Initialize the DMSManager with all necessary queues and the TCP port
-    DMSManager dmsManager(cameraQueue, preprocessingQueue, faceDetectionQueue, drowsinessDetectionQueue, headposeDetectionQueue,eyegazeDetectionQueue,framesQueue,eyegazeframesQueue, tcpOutputQueue, tcpPort, stateOutputQueue, postOutputQueue,commandsQueue,faultsQueue);
+    DMSManager dmsManager(cameraQueue, preprocessingQueue, faceDetectionQueue, faceRectQueue,
+ drowsinessDetectionQueue, headposeDetectionQueue,eyegazeDetectionQueue,framesQueue,eyegazeframesQueue, tcpOutputQueue, tcpPort, stateOutputQueue, postOutputQueue,commandsQueue,faultsQueue);
 
     // Initialize the camera component
 ///home/dms/Downloads/drowsiness_detection-master/src/sample_videos/driver_day.mp4
@@ -91,7 +93,7 @@ int main() {
         }
 
         //if (eyegazeframesQueue.tryPop(eyegazeFrame) && !eyegazeFrame.empty()) {
-          // cv::imshow("Eye Gaze", eyegazeFrame);
+        //   cv::imshow("Eye Gaze", eyegazeFrame);
         //}
 
 

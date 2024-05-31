@@ -1,12 +1,13 @@
 #include "headposecomponent.h"
-#include "infer.h"
+#include "inferseq.h"
 
 
 TRTEngineSingleton* TRTEngineSingleton::instance = nullptr;
 
 //constructor
-HeadPoseComponent::HeadPoseComponent(ThreadSafeQueue<cv::Mat>& inputQueue, ThreadSafeQueue<std::string>& outputQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
-: inputQueue(inputQueue), outputQueue(outputQueue),framesQueue(framesQueue) ,commandsQueue(commandsQueue),faultsQueue(faultsQueue), running(false) {}
+HeadPoseComponent::HeadPoseComponent(ThreadSafeQueue<cv::Mat>& inputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue, ThreadSafeQueue<std::vector<std::vector<float>>>& outputQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
+: inputQueue(inputQueue), faceRectQueue(faceRectQueue), outputQueue(outputQueue),framesQueue(framesQueue) ,commandsQueue(commandsQueue),faultsQueue(faultsQueue), running(false) {}
+
 
 
 //destructor
@@ -38,53 +39,45 @@ void HeadPoseComponent::stopHeadPoseDetection() {
 }
 
 
-// This loop takes frame from input queue , sends it to detect faces and places it into the output queue
 void HeadPoseComponent::HeadPoseDetectionLoop() {
     cv::Mat frame;
-    this->lastTime = std::chrono::high_resolution_clock::now(); // Initialize the last time
     bool isFirstFrame = true; // Flag to check if it's the first frame
 
     while (running) {
         if (inputQueue.tryPop(frame)) {
-
-
-
-            auto start = std::chrono::high_resolution_clock::now();
-            detectHeadPose(frame);
-            auto end = std::chrono::high_resolution_clock::now();
-
-            double detectionTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-            //updatePerformanceMetrics(detectionTime);
-            //displayPerformanceMetrics(frame);
-
-
-
-
-
-            framesQueue.push(frame);
-
-          if (isFirstFrame) {
+            cv::Mat croppedFace;
+            // Assuming the face is detected and bounded by a rectangle
+            cv::Rect faceRect = detectFaceRectangle(frame); // Implement this function to find the rectangle
+            if (faceRect.width > 0 && faceRect.height > 0) {
+                croppedFace = frame(faceRect);
+                auto readings = detectHeadPose(croppedFace);
+                framesQueue.push(frame);
+                outputQueue.push(readings);
+		if (isFirstFrame) {
                 inputQueue.clear(); // Clear the queue after the first frame is processed
                 isFirstFrame = false; // Update the flag so the queue won't be cleared again
+            	}
             }
         }
     }
+}
+
+std::vector<std::vector<float>> HeadPoseComponent::detectHeadPose(cv::Mat& croppedFace) {
+    TRTEngineSingleton* trt = TRTEngineSingleton::getInstance();
+    auto start = std::chrono::high_resolution_clock::now();
+    std::vector<std::vector<float>> out = trt->infer(croppedFace);
+    auto end = std::chrono::high_resolution_clock::now();
+    double engineTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "Head pose time: " << engineTime << " ms" << std::endl;
+    return out;
 }
 
 
 
 
 
-//function to start the head pose detection
-void HeadPoseComponent::detectHeadPose(cv::Mat& frame) {
 
-    TRTEngineSingleton* trt=TRTEngineSingleton::getInstance();
-    auto start = std::chrono::high_resolution_clock::now();
-    std::vector<float> out = trt->infer(frame);
-    auto end = std::chrono::high_resolution_clock::now();
-    double engineTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "head pose time:" << std::endl;
-    std::cout << engineTime << std::endl;
+
     //std::string timeText = "time: " + std::to_string(int(engineTime))+"ms";
     //cv::putText(frame, timeText, cv::Point(20, 20), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
     //double fps = 1000/engineTime;
@@ -106,25 +99,34 @@ void HeadPoseComponent::detectHeadPose(cv::Mat& frame) {
     //}
 
 
-    for (float x : out){
-	printf("%f \n",x);
-	}
+    //for (float x : out){
+	//printf("%f \n",x);
+	//}
 
     //for (const auto& row : out) {
         // Loop through each element in the sub-vector
         //for (const auto& elem : row) {
-        //    std::cout << elem << " ";
-       // }
-      //  std::cout << std::endl;  // New line for each row
-    //}
+          //  std::cout << elem << " ";
+        //}
+        //std::cout << std::endl;  // New line for each row
+   // }
 
 
 
 	
    //outputQueue.push(out);
 
-}
 
+
+
+cv::Rect HeadPoseComponent::detectFaceRectangle(const cv::Mat& frame) {
+    cv::Rect faceRect;
+    if (!faceRectQueue.tryPop(faceRect)) {
+        std::cerr << "No face rectangle found in the queue." << std::endl;
+        return cv::Rect(); // Return an empty rectangle
+    }
+    return faceRect;
+}
 
 
 

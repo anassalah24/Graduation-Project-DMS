@@ -14,8 +14,9 @@
 class DMSManager {
 public:
     DMSManager(ThreadSafeQueue<cv::Mat>& cameraQueue, ThreadSafeQueue<cv::Mat>& preprocessingQueue,
-    ThreadSafeQueue<cv::Mat>& faceDetectionQueue, ThreadSafeQueue<cv::Mat>& drowsinessDetectionQueue,
-    ThreadSafeQueue<std::string>& headposeDetectionQueue, ThreadSafeQueue<std::string>& eyegazeDetectionQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<cv::Mat>& eyegazeframesQueue,
+    ThreadSafeQueue<cv::Mat>& faceDetectionQueue, ThreadSafeQueue<cv::Rect>& faceRectQueue,
+ ThreadSafeQueue<cv::Mat>& drowsinessDetectionQueue,
+    ThreadSafeQueue<std::vector<std::vector<float>>>& headposeDetectionQueue, ThreadSafeQueue<std::string>& eyegazeDetectionQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<cv::Mat>& eyegazeframesQueue,
     ThreadSafeQueue<cv::Mat>& tcpOutputQueue, int tcpPort, ThreadSafeQueue<CarState>& stateOutputQueue ,
     ThreadSafeQueue<int>& postOutputQueue,ThreadSafeQueue<std::string>& commandsQueue,
     ThreadSafeQueue<std::string>& faultsQueue);
@@ -54,12 +55,13 @@ private:
     ThreadSafeQueue<cv::Mat>& cameraQueue;
     ThreadSafeQueue<cv::Mat>& preprocessingQueue;
     ThreadSafeQueue<cv::Mat>& faceDetectionQueue;
+    ThreadSafeQueue<cv::Rect>& faceRectQueue;
     ThreadSafeQueue<cv::Mat>& drowsinessDetectionQueue;
-    ThreadSafeQueue<std::string>& headposeDetectionQueue;
+    ThreadSafeQueue<std::vector<std::vector<float>>>& headposeDetectionQueue;
     ThreadSafeQueue<std::string>& eyegazeDetectionQueue;
     ThreadSafeQueue<cv::Mat>& framesQueue;
     ThreadSafeQueue<cv::Mat>& eyegazeframesQueue;
-    ThreadSafeQueue<cv::Mat> tcpOutputQueue;
+    ThreadSafeQueue<cv::Mat>& tcpOutputQueue;
     ThreadSafeQueue<CarState>& stateOutputQueue;
     ThreadSafeQueue<int>& postOutputQueue;
 

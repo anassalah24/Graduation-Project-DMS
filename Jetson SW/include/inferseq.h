@@ -22,7 +22,7 @@ private:
     ICudaEngine* engine2;
     TRTEngineSingleton() : engine1(nullptr), engine2(nullptr) {
         // Load TensorRT engines only once
-        engine1 = loadEngine("/home/dms/DMS/ModularCode/include/Ax.engine");
+        engine1 = loadEngine("/home/dms/DMS/ModularCode/include/Ay.engine");
         engine2 = loadEngine("/home/dms/DMS/ModularCode/modelconfigs/mobilenetv3_engine.engine");
         if (!engine1 || !engine2) {
             std::cerr << "Failed to load one or both engines" << std::endl;
