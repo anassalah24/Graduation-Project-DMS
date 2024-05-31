@@ -5,6 +5,8 @@
 #include <QTcpSocket>
 #include <QImage>
 #include <opencv2/opencv.hpp>
+#include <vector>
+#include <cstdint>  // For uint8_t
 
 class DataHandler : public QObject {
     Q_OBJECT
@@ -15,6 +17,7 @@ public:
 
 signals:
     void faceReceived(QImage faceImage);
+    void readingsReceived(const std::vector<std::vector<float>>& readings);  // New signal for deserialized readings
 
 private slots:
     void onDataReady1();
@@ -24,6 +27,7 @@ private:
     QTcpSocket *tcpSocket1;
     QTcpSocket *tcpSocket2;
     QImage matToQImage(const cv::Mat &mat);
+    std::vector<std::vector<float>> deserialize(const std::vector<uint8_t>& buffer);
 };
 
 #endif // DATAHANDLER_H

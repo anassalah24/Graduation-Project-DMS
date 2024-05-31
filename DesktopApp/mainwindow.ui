@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1318</width>
-    <height>805</height>
+    <width>1323</width>
+    <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,27 +85,10 @@
       <x>290</x>
       <y>670</y>
       <width>761</width>
-      <height>80</height>
+      <height>111</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="readings_layout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
-       </property>
-       <property name="lineWidth">
-        <number>3</number>
-       </property>
-       <property name="text">
-        <string>Readings Here</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <layout class="QGridLayout" name="readings_layout"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -113,7 +96,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1318</width>
+     <width>1323</width>
      <height>25</height>
     </rect>
    </property>

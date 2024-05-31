@@ -17,6 +17,7 @@ SOURCES += \
     drivermonitoringwidget.cpp \
     main.cpp \
     mainwindow.cpp \
+    readingswidget.cpp \
     systemcontrol.cpp
 
 HEADERS += \
@@ -24,12 +25,14 @@ HEADERS += \
     datahandler.h \
     drivermonitoringwidget.h \
     mainwindow.h \
+    readingswidget.h \
     systemcontrol.h
 
 FORMS += \
     connectionwidget.ui \
     drivermonitoringwidget.ui \
     mainwindow.ui \
+    readingswidget.ui \
     systemcontrol.ui
 
 # Default rules for deployment.

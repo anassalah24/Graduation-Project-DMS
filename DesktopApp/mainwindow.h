@@ -6,6 +6,7 @@
 #include "datahandler.h"
 #include "drivermonitoringwidget.h"
 #include "systemcontrol.h"
+#include "readingswidget.h"
 #include <opencv2/opencv.hpp>
 
 namespace Ui {
@@ -25,6 +26,7 @@ private:
     DataHandler *dataHandler;
     DriverMonitoringWidget *driverMonitoringWidget;
     SystemControl *systemcontrol;
+    ReadingsWidget *readingsWidget;
 
 };
 

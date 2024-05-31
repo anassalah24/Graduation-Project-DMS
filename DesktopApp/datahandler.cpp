@@ -37,10 +37,26 @@ void DataHandler::onDataReady2() {
     // Read all available data from the second socket
     QByteArray data = tcpSocket2->readAll();
 
+    // Convert QByteArray to std::vector<uint8_t>
+    std::vector<uint8_t> buffer(data.begin(), data.end());
+
+    // Deserialize the data
+    std::vector<std::vector<float>> readings = deserialize(buffer);
+
     // Print the received data to the console
     qDebug() << "Received data on socket 2:" << data;
+    qDebug() << "Deserialized readings:";
 
-    // Here, you can implement additional logic to handle the received data
+    for (const auto& row : readings) {
+        QString rowStr;
+        for (const auto& value : row) {
+            rowStr += QString::number(value) + " ";
+        }
+        qDebug() << rowStr;
+    }
+    // Emit the readingsReceived signal with the deserialized data
+    emit readingsReceived(readings);
+    // Here, you can implement additional logic to handle the deserialized data
 }
 
 void DataHandler::sendData(const QByteArray &data) {
@@ -63,4 +79,27 @@ QImage DataHandler::matToQImage(const cv::Mat &mat) {
     default:
         return QImage();
     }
+}
+
+
+// Function to deserialize a byte array to a 2D vector of floats
+std::vector<std::vector<float>> DataHandler::deserialize(const std::vector<uint8_t>& buffer) {
+    size_t rows, cols;
+    const uint8_t* ptr = buffer.data();
+
+    // Copy rows and cols from the buffer
+    std::memcpy(&rows, ptr, sizeof(size_t));
+    ptr += sizeof(size_t);
+    std::memcpy(&cols, ptr, sizeof(size_t));
+    ptr += sizeof(size_t);
+
+    std::vector<std::vector<float>> data(rows, std::vector<float>(cols));
+
+    // Copy each float value from the buffer
+    for (auto& row : data) {
+        std::memcpy(row.data(), ptr, row.size() * sizeof(float));
+        ptr += row.size() * sizeof(float);
+    }
+
+    return data;
 }
