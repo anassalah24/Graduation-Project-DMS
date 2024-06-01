@@ -1,0 +1,17 @@
+[Unit]
+Description=Run button_start.py at boot
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/dms/button_start.py
+WorkingDirectory=/home/dms
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="LD_LIBRARY_PATH=/usr/local/lib:/usr/lib/aarch64-linux-gnu:/usr/local/cuda/lib64"
+StandardOutput=journal
+StandardError=journal
+Restart=always
+User=dms
+
+[Install]
+WantedBy=multi-user.target
+
