@@ -29,9 +29,9 @@ DMSManager::~DMSManager() {
 //startup system
 bool DMSManager::startSystem() {
     if (running) return false;  // Prevent the system from starting if it's already running
-
     running = true;
 
+	if (firstRun){
     //starting each component in its own thread
     cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
     //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
@@ -44,7 +44,38 @@ bool DMSManager::startSystem() {
     //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
     commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
     //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
-    return true;
+	firstRun = false ;    
+	return true;
+	}
+	else{
+	//starting each component in its own thread
+	cameraComponent.initialize("/dev/video0");
+    cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
+    //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
+	faceDetectionComponent.initialize("/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.weights");
+    faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
+    //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
+    headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
+    //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
+    //tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
+    //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
+    //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
+    //commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
+    //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
+    //----------------------------------------
+	cameraComponent.startCapture();
+    //preprocessingComponent.startProcessing();
+    faceDetectionComponent.startDetection();
+    //drowsinessComponent.startDrowsinessDetection();
+    headposeComponent.startHeadPoseDetection();
+    //eyegazeComponent.startEyeGazeDetection();
+    //tcpComponent.startServer();
+    //vehicleStateManager.startStateManager();
+    //postProcessingComponent.postProcess();
+    //faultManager.faultstart();
+	firstRun = false ;
+	return true;
+	}
 }
 
 
@@ -53,31 +84,33 @@ void DMSManager::stopSystem() {
 
     running = false;  // Signal all loops to stop
      
+    clearQueues();
+
     cameraComponent.stopCapture();
     preprocessingComponent.stopProcessing();
     faceDetectionComponent.stopDetection();
     drowsinessComponent.stopDrowsinessDetection();
     headposeComponent.stopHeadPoseDetection();
     eyegazeComponent.stopEyeGazeDetection();
-    tcpComponent.stopServer();
-    vehicleStateManager.stopStateManager();
-    postProcessingComponent.stopPostProcess();
-    faultManager.faultstop();
+    //tcpComponent.stopServer();
+    //vehicleStateManager.stopStateManager();
+    //postProcessingComponent.stopPostProcess();
+    //faultManager.faultstop();
 	
 
    
     // Wait for each thread to finish its task and join
     if (cameraThread.joinable()) cameraThread.join();
-    if (preprocessingThread.joinable()) preprocessingThread.join();
+    //if (preprocessingThread.joinable()) preprocessingThread.join();
     if (faceDetectionThread.joinable()) faceDetectionThread.join();
-    if (drowsinessThread.joinable()) drowsinessThread.join();
+    //if (drowsinessThread.joinable()) drowsinessThread.join();
     if (headposeThread.joinable()) headposeThread.join();
-    if (eyegazeThread.joinable()) eyegazeThread.join();
-    if (tcpThread.joinable()) tcpThread.join();
-    if (vehicleStateThread.joinable()) vehicleStateThread.join();
-    if (postProcessingThread.joinable()) postProcessingThread.join();
-    if (commandsThread.joinable()) commandsThread.join();
-    if (faultsThread.joinable()) faultsThread.join();
+    //if (eyegazeThread.joinable()) eyegazeThread.join();
+    //if (tcpThread.joinable()) tcpThread.join();
+    //if (vehicleStateThread.joinable()) vehicleStateThread.join();
+    //if (postProcessingThread.joinable()) postProcessingThread.join();
+    //if (commandsThread.joinable()) commandsThread.join();
+    //if (faultsThread.joinable()) faultsThread.join();
 
 
     // ADD Additional cleanup if necessary
@@ -121,7 +154,7 @@ void DMSManager::faultsLoop(){
 //loop for DMSmanager component to check for any needed commands by components
 void DMSManager::commandsLoop(){
     std::string command;
-    while (running) {
+    while (true) {//changed to true
         if (commandsQueue.tryPop(command)) {
             std::cout << "Received command in the dms manager "<< command << std::endl;
 	        this->handlecommand(command);
@@ -148,6 +181,8 @@ void DMSManager::setCamereSource(const std::string& source) {
     cameraComponent.setSource(source);
     clearQueues();
 }
+
+
 
 void DMSManager::clearQueues(){
 

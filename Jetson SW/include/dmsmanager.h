@@ -87,6 +87,7 @@ private:
 
     int tcpPort; 
     bool running;
+    bool firstRun = true;
 
     void cameraLoop();
     void preprocessingLoop();
