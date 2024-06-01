@@ -17,7 +17,10 @@ public:
     explicit SystemControl(DataHandler *dataHandler, QWidget *parent = nullptr);
     ~SystemControl();
 
+
 private slots:
+    void onSystemOnClicked();
+    void onSystemOffClicked();
     void onSendButtonClicked();
 
 private:
