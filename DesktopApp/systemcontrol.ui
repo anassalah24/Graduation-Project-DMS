@@ -26,10 +26,10 @@
     <string>Face Detection Models</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton">
+  <widget class="QRadioButton" name="fd1">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>230</y>
      <width>112</width>
      <height>26</height>
@@ -39,10 +39,10 @@
     <string>YoloV3 Tiny</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_2">
+  <widget class="QRadioButton" name="fd2">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>270</y>
      <width>112</width>
      <height>26</height>
@@ -52,7 +52,7 @@
     <string>YoloV2</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_3">
+  <widget class="QRadioButton" name="noFD">
    <property name="geometry">
     <rect>
      <x>130</x>
@@ -78,7 +78,7 @@
     <string>Head Pose Model</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_4">
+  <widget class="QRadioButton" name="hp3">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -91,7 +91,7 @@
     <string>AZ</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_5">
+  <widget class="QRadioButton" name="hp2">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -104,7 +104,7 @@
     <string>AY</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_6">
+  <widget class="QRadioButton" name="hp1">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -130,7 +130,7 @@
     <string>Eye Gaze Model</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_7">
+  <widget class="QRadioButton" name="eg2">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -143,7 +143,7 @@
     <string>AY</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_8">
+  <widget class="QRadioButton" name="eg3">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -156,7 +156,7 @@
     <string>AZ</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_9">
+  <widget class="QRadioButton" name="eg1">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -192,7 +192,7 @@
     <string>Send</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_10">
+  <widget class="QRadioButton" name="noHP">
    <property name="geometry">
     <rect>
      <x>130</x>
@@ -205,7 +205,7 @@
     <string>No Head Pose</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_11">
+  <widget class="QRadioButton" name="noEG">
    <property name="geometry">
     <rect>
      <x>130</x>
