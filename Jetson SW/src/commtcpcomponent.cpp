@@ -180,8 +180,20 @@ void CommTCPComponent::handleCommandClient(int clientSocket) {
                     std::cout << "Received SET_SOURCE command with value: " << message.substr(11) << std::endl;
                     std::string command = "SET_SOURCE:" + message.substr(11);
                     commandsQueue.push(command);
+
+                } else if (message.find("SET_FD_MODEL") != std::string::npos) {
+                    std::cout << "Received SET_FD_MODEL command with value: " << message.substr(13) << std::endl;
+                    commandsQueue.push("SET_FD_MODEL:" + message.substr(13));
+
+                } else if (message.find("SET_HP_MODEL") != std::string::npos) {
+                    std::cout << "Received SET_HP_MODEL command with value: " << message.substr(13) << std::endl;
+                    commandsQueue.push("SET_HP_MODEL:" + message.substr(13));
+
+                } else if (message.find("SET_EG_MODEL") != std::string::npos) {
+                    std::cout << "Received SET_EG_MODEL command with value: " << message.substr(13) << std::endl;
+                    commandsQueue.push("SET_EG_MODEL:" + message.substr(13));
+
                 } else {
-                    // Unknown command
                     std::cout << "Received unknown command: " << message << std::endl;
                 }
             }

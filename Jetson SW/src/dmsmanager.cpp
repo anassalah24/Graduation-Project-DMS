@@ -3,8 +3,9 @@
 
 //Constructor ; passes input and ouptut queues for different component and tcp port
 DMSManager::DMSManager(ThreadSafeQueue<cv::Mat>& cameraQueue, ThreadSafeQueue<cv::Mat>& preprocessingQueue, ThreadSafeQueue<cv::Mat>& faceDetectionQueue, ThreadSafeQueue<cv::Rect>& faceRectQueue,
- ThreadSafeQueue<cv::Mat>& drowsinessDetectionQueue,ThreadSafeQueue<std::vector<std::vector<float>>>& headposeDetectionQueue, ThreadSafeQueue<std::string>& eyegazeDetectionQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<cv::Mat>& eyegazeframesQueue, ThreadSafeQueue<cv::Mat>& tcpOutputQueue, int tcpPort , ThreadSafeQueue<CarState>& stateOutputQueue , ThreadSafeQueue<int>& postOutputQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
-:cameraComponent(cameraQueue,commandsQueue,faultsQueue),
+ThreadSafeQueue<cv::Mat>& drowsinessDetectionQueue,ThreadSafeQueue<std::vector<std::vector<float>>>& headposeDetectionQueue, ThreadSafeQueue<std::string>& eyegazeDetectionQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<cv::Mat>& eyegazeframesQueue, ThreadSafeQueue<cv::Mat>& tcpOutputQueue, int tcpPort , ThreadSafeQueue<CarState>& stateOutputQueue , ThreadSafeQueue<int>& postOutputQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
+:
+cameraComponent(cameraQueue,commandsQueue,faultsQueue),
 preprocessingComponent(cameraQueue, preprocessingQueue,commandsQueue,faultsQueue), 
 faceDetectionComponent(cameraQueue, faceDetectionQueue, faceRectQueue, commandsQueue,faultsQueue),
 drowsinessComponent(faceDetectionQueue, drowsinessDetectionQueue,commandsQueue,faultsQueue),
@@ -259,7 +260,39 @@ void DMSManager::handlecommand(std::string& command) {
     } else if (command == "TURN_ON") {
         std::cout << "Turning on..." << std::endl;
 	startSystem();
-	
+
+    // Handling Face Detection Model
+    }else if (command.find("SET_FD_MODEL:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string modelValue = command.substr(pos + 1);
+            std::cout << "Setting Face Detection Model to: " << modelValue << std::endl;
+	    //implement model changes
+        } else {
+            std::cerr << "Invalid SET_FD_MODEL command format: " << command << std::endl;
+        }
+    
+    // Handling Head Pose Model
+    }else if (command.find("SET_HP_MODEL:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string modelValue = command.substr(pos + 1);
+            std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
+	    //implement model changes
+        } else {
+            std::cerr << "Invalid SET_HP_MODEL command format: " << command << std::endl;
+        }
+    
+    // Handling Eye Gaze Model
+    }else if (command.find("SET_EG_MODEL:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string modelValue = command.substr(pos + 1);
+            std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
+	    //implement model changes
+        } else {
+            std::cerr << "Invalid SET_EG_MODEL command format: " << command << std::endl;
+        }
 
    // Handle unknown command
     } else { 
