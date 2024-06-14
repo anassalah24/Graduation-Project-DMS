@@ -31,7 +31,7 @@ int main() {
 
     // Initialize the camera component
 ///home/dms/Downloads/drowsiness_detection-master/src/sample_videos/driver_day.mp4
-    if (!dmsManager.initializeCamera("/home/dms/DMS/Videos/CROPPED.MOV")) { // use /dev/video0 for camera or /path/to/video/file
+    if (!dmsManager.initializeCamera("/dev/video0")) { // use /dev/video0 for camera or /path/to/video/file
         std::cerr << "Failed to initialize camera component." << std::endl;
         return -1;
     }
