@@ -16,29 +16,14 @@ SystemControl::SystemControl(DataHandler *dataHandler, QWidget *parent) :
     // Connect the OFF button signal to the slot
     connect(ui->offbutton, &QPushButton::clicked, this, &SystemControl::onSystemOffClicked);
 
-
-    // Creating button groups
-    QButtonGroup *faceDetectionGroup = new QButtonGroup(this);
-    faceDetectionGroup->addButton(ui->fd1);
-    faceDetectionGroup->addButton(ui->fd2);
-    faceDetectionGroup->addButton(ui->noFD);
-    ui->fd1->setChecked(true); // Set first radio button as selected by default in Face Detection
-
-
-    QButtonGroup *headPoseGroup = new QButtonGroup(this);
-    headPoseGroup->addButton(ui->hp1);
-    headPoseGroup->addButton(ui->hp2);
-    headPoseGroup->addButton(ui->hp3);
-    headPoseGroup->addButton(ui->noHP);
-    ui->hp1->setChecked(true); // Set first radio button as selected by default in Head Pose
-
-
-    QButtonGroup *eyeGazeGroup = new QButtonGroup(this);
-    eyeGazeGroup->addButton(ui->eg1);
-    eyeGazeGroup->addButton(ui->eg2);
-    eyeGazeGroup->addButton(ui->eg3);
-    eyeGazeGroup->addButton(ui->noEG);
-    ui->eg1->setChecked(true); // Set first radio button as selected by default in Eye Gaze
+    // Populate the combo boxes with model options
+    ui->comboFaceDetection->addItems({"YoloV3 Tiny", "YoloV2", "No Face Detection"});
+    ui->comboHeadPose->addItems({"AX", "AY", "AZ", "A0","eff0","eff1","eff2","eff3","No Head Pose"});
+    ui->comboEyeGaze->addItems({"mobilenetv3", "squeezenet", "resnet", "mobilenet", "No Eye Gaze"});
+    // Set default initial values
+    ui->comboFaceDetection->setCurrentIndex(ui->comboFaceDetection->findText("YoloV2"));
+    ui->comboHeadPose->setCurrentIndex(ui->comboHeadPose->findText("AY"));
+    ui->comboEyeGaze->setCurrentIndex(ui->comboEyeGaze->findText("mobilenetv3"));
 
 }
 
@@ -48,41 +33,10 @@ SystemControl::~SystemControl()
 }
 
 void SystemControl::onSendButtonClicked() {
-    // QString text = ui->trialLineedit->text();
-    // QByteArray data = text.toUtf8();
-    // dataHandler->sendData(data);
-
-    // Retrieve selected options from the UI components
-    QString faceDetectionModel;
-    if (ui->fd1->isChecked()) {
-        faceDetectionModel = "YoloV3 Tiny";
-    } else if (ui->fd2->isChecked()) {
-        faceDetectionModel = "YoloV2";
-    } else if (ui->noFD->isChecked()) {
-        faceDetectionModel = "No Face Detection";
-    }
-
-    QString headPoseModel;
-    if (ui->hp1->isChecked()) {
-        headPoseModel = "AX";
-    } else if (ui->hp2->isChecked()) {
-        headPoseModel = "AY";
-    } else if (ui->hp3->isChecked()) {
-        headPoseModel = "AZ";
-    } else if (ui->noHP->isChecked()) {
-        headPoseModel = "No Head Pose";
-    }
-
-    QString eyeGazeModel;
-    if (ui->eg1->isChecked()) {
-        eyeGazeModel = "AX";
-    } else if (ui->eg2->isChecked()) {
-        eyeGazeModel = "AY";
-    } else if (ui->eg3->isChecked()) {
-        eyeGazeModel = "AZ";
-    } else if (ui->noEG->isChecked()) {
-        eyeGazeModel = "No Eye Gaze";
-    }
+    // Retrieve selected options from the combo boxes
+    QString faceDetectionModel = ui->comboFaceDetection->currentText();
+    QString headPoseModel = ui->comboHeadPose->currentText();
+    QString eyeGazeModel = ui->comboEyeGaze->currentText();
 
     // Construct configuration messages
     QString faceDetectionMessage = "SET_FD_MODEL:" + faceDetectionModel;
@@ -109,7 +63,6 @@ void SystemControl::onSendButtonClicked() {
     dataHandler->sendData(hpData);
     dataHandler->sendData(egData);
 }
-
 
 
 

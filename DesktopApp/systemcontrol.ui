@@ -26,45 +26,6 @@
     <string>Face Detection Models</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="fd1">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>230</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>YoloV3 Tiny</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="fd2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>270</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>YoloV2</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="noFD">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>250</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>No Face Detection</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
@@ -78,45 +39,6 @@
     <string>Head Pose Model</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="hp3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>410</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AZ</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="hp2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>380</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AY</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="hp1">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>350</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AX</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
@@ -128,45 +50,6 @@
    </property>
    <property name="text">
     <string>Eye Gaze Model</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="eg2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>510</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AY</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="eg3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>540</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AZ</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="eg1">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>480</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AX</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="trialLineedit">
@@ -190,32 +73,6 @@
    </property>
    <property name="text">
     <string>Send</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="noHP">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>380</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>No Head Pose</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="noEG">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>510</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>No Eye Gaze</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -274,6 +131,36 @@
    </property>
    <property name="text">
     <string>ON</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboFaceDetection">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>240</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboHeadPose">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>360</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboEyeGaze">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>500</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
    </property>
   </widget>
  </widget>
