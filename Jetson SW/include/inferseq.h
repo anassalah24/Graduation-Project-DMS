@@ -2,9 +2,10 @@
 #define INFER_H
 
 #include <iostream>
-#include <fstream> 
-#include <vector> 
-#include <NvInfer.h> 
+#include <fstream>
+#include <vector>
+#include <mutex>
+#include <NvInfer.h>
 #include <opencv2/opencv.hpp>
 
 using namespace nvinfer1;
@@ -18,27 +19,85 @@ class Logger : public ILogger {
 class TRTEngineSingleton {
 private:
     static TRTEngineSingleton* instance;
-    ICudaEngine* engine1;
-    ICudaEngine* engine2;
+    static std::mutex mtx; // Mutex for thread safety
+    ICudaEngine* engine1; // Head pose engine
+    ICudaEngine* engine2; // Eye gaze engine
+
     TRTEngineSingleton() : engine1(nullptr), engine2(nullptr) {
-        // Load TensorRT engines only once
-        engine1 = loadEngine("/home/dms/DMS/ModularCode/include/Ay.engine");
-        engine2 = loadEngine("/home/dms/DMS/ModularCode/modelconfigs/mobilenetv3_engine.engine");
-        if (!engine1 || !engine2) {
-            std::cerr << "Failed to load one or both engines" << std::endl;
-            // Handle error appropriately, maybe throw an exception
-        }
+        loadEngines(); // Initial engine loading
     }
 
 public:
     static TRTEngineSingleton* getInstance() {
+        std::lock_guard<std::mutex> lock(mtx);
         if (!instance) {
             instance = new TRTEngineSingleton();
         }
         return instance;
     }
 
+    void loadEngines() {
+        //std::lock_guard<std::mutex> lock(mtx); // Lock during engine loading
+        engine1 = loadEngine("/home/dms/DMS/ModularCode/include/Ay.engine");
+        engine2 = loadEngine("/home/dms/DMS/ModularCode/modelconfigs/mobilenetv3_engine.engine");
+		std::cout << "loaded engines successfullyyyyyyyyyyyyyyyyyyyyyyyyyy " << std::endl;
+        if (!engine1 || !engine2) {
+            std::cerr << "Failed to load one or both engines" << std::endl;
+        }
+    }
+
+	// Set new engine for head pose
+	void setEngine1(const std::string& enginePath) {
+		std::lock_guard<std::mutex> lock(mtx); // Ensure thread safety during engine swap
+		std::cout << "Loading new engine for head pose from: " << enginePath << std::endl;
+
+		// First, safely destroy any existing engine
+		if (engine1) {
+		    std::cout << "Destroying old engine for head pose." << std::endl;
+		    engine1->destroy();
+		    engine1 = nullptr; // Clear the old pointer after destruction
+		}
+
+		// Load the new engine
+		ICudaEngine* newEngine = loadEngine(enginePath);
+		if (newEngine) {
+		    engine1 = newEngine;
+		    std::cout << "Updated engine for head pose successfully." << std::endl;
+		} else {
+		    std::cerr << "Failed to load new engine for head pose from: " << enginePath << std::endl;
+		}
+	}
+
+	// Set new engine for eye gaze
+	void setEngine2(const std::string& enginePath) {
+		std::lock_guard<std::mutex> lock(mtx); // Ensure thread safety during engine swap
+		std::cout << "Loading new engine for eye gaze from: " << enginePath << std::endl;
+
+		// First, safely destroy any existing engine
+		if (engine2) {
+		    std::cout << "Destroying old engine for eye gaze." << std::endl;
+		    engine2->destroy();
+		    engine2 = nullptr; // Clear the old pointer after destruction
+		}
+
+		// Load the new engine
+		ICudaEngine* newEngine = loadEngine(enginePath);
+		if (newEngine) {
+		    engine2 = newEngine;
+		    std::cout << "Updated engine for eye gaze successfully." << std::endl;
+		} else {
+		    std::cerr << "Failed to load new engine for eye gaze from: " << enginePath << std::endl;
+		}
+	}
+
+
     std::vector<std::vector<float>> infer(const cv::Mat& frame) {
+		std::lock_guard<std::mutex> lock(mtx); // Protect inference process
+
+		if (!engine1 || !engine2) {
+		    std::cerr << "Engine not loaded, skipping inference." << std::endl;
+		    return {{-1}, {-1}};
+		}
         // Create execution contexts
         IExecutionContext* context1 = engine1->createExecutionContext();
         IExecutionContext* context2 = engine2->createExecutionContext();
@@ -113,7 +172,9 @@ public:
         // No need to destroy the engines here since they're managed by the singleton
     }
 
+
     ~TRTEngineSingleton() {
+        std::lock_guard<std::mutex> lock(mtx);
         if (engine1) {
             engine1->destroy();
             engine1 = nullptr;
@@ -144,5 +205,8 @@ private:
         return runtime->deserializeCudaEngine(buffer.data(), buffer.size(), nullptr);
     }
 };
+
+std::mutex TRTEngineSingleton::mtx;
+//extern TRTEngineSingleton* TRTEngineSingleton::instance=null;
 
 #endif

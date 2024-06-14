@@ -15,6 +15,8 @@ public:
     bool initialize();
     void startHeadPoseDetection();
     void stopHeadPoseDetection();
+    void updateHeadPoseEngine(const std::string& headPoseEnginePath);
+    void updateEyeGazeEngine(const std::string& eyeGazeEnginePath);
 
 
 

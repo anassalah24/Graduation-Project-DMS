@@ -202,7 +202,26 @@ void DMSManager::clearQueues(){
 }
 
 
+
 void DMSManager::handlecommand(std::string& command) {
+	// Example model paths
+	std::map<std::string, std::string> headPoseModels = {
+		{"AX", "/home/dms/DMS/ModularCode/include/Ax.engine"},
+		{"AY", "/home/dms/DMS/ModularCode/include/Ay.engine"},
+		{"AZ", "/home/dms/DMS/ModularCode/include/Az.engine"},
+		{"A0", "/home/dms/DMS/ModularCode/include/A0.engine"},
+		{"eff0", "/home/dms/DMS/ModularCode/include/eff0.engine"},
+		{"eff1", "/home/dms/DMS/ModularCode/include/eff1.engine"},
+		{"eff2", "/home/dms/DMS/ModularCode/include/eff2.engine"},
+		{"eff3", "/home/dms/DMS/ModularCode/include/eff3.engine"}
+	};
+
+	std::map<std::string, std::string> eyeGazeModels = {
+		{"mobilenetv3", "/home/dms/DMS/ModularCode/modelconfigs/mobilenetv3_engine.engine"},
+		{"squeezenet", "/home/dms/DMS/ModularCode/modelconfigs/squeezenet.engine"},
+		{"resnet", "/home/dms/DMS/ModularCode/include/resnet_engine.engine"},
+		{"mobilenet", "/home/dms/DMS/ModularCode/include/mobilenet_engine.engine"}
+	};
 
     //setting FPS
     if (command.find("SET_FPS:") != std::string::npos) {
@@ -272,27 +291,34 @@ void DMSManager::handlecommand(std::string& command) {
             std::cerr << "Invalid SET_FD_MODEL command format: " << command << std::endl;
         }
     
-    // Handling Head Pose Model
-    }else if (command.find("SET_HP_MODEL:") != std::string::npos) {
-        size_t pos = command.find(":");
-        if (pos != std::string::npos) {
-            std::string modelValue = command.substr(pos + 1);
-            std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
-	    //implement model changes
-        } else {
-            std::cerr << "Invalid SET_HP_MODEL command format: " << command << std::endl;
-        }
-    
-    // Handling Eye Gaze Model
-    }else if (command.find("SET_EG_MODEL:") != std::string::npos) {
-        size_t pos = command.find(":");
-        if (pos != std::string::npos) {
-            std::string modelValue = command.substr(pos + 1);
-            std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
-	    //implement model changes
-        } else {
-            std::cerr << "Invalid SET_EG_MODEL command format: " << command << std::endl;
-        }
+	}else if (command.find("SET_HP_MODEL:") != std::string::npos) {
+		size_t pos = command.find(":");
+		if (pos != std::string::npos) {
+		    std::string modelValue = command.substr(pos + 1);
+		    std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
+		    if (headPoseModels.find(modelValue) != headPoseModels.end()) {
+		        headposeComponent.updateHeadPoseEngine(headPoseModels[modelValue]);
+				clearQueues();
+		    } else {
+		        std::cerr << "Head pose model identifier not recognized: " << modelValue << std::endl;
+		    }
+		} else {
+		    std::cerr << "Invalid SET_HP_MODEL command format: " << command << std::endl;
+		}
+	} else if (command.find("SET_EG_MODEL:") != std::string::npos) {
+		size_t pos = command.find(":");
+		if (pos != std::string::npos) {
+		    std::string modelValue = command.substr(pos + 1);
+		    std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
+		    if (eyeGazeModels.find(modelValue) != eyeGazeModels.end()) {
+		        headposeComponent.updateEyeGazeEngine(eyeGazeModels[modelValue]);
+				clearQueues();
+		    } else {
+		        std::cerr << "Eye gaze model identifier not recognized: " << modelValue << std::endl;
+		    }
+		}else {
+        std::cerr << "Invalid SET_EG_MODEL command format: " << command << std::endl;
+    	}
 
    // Handle unknown command
     } else { 
