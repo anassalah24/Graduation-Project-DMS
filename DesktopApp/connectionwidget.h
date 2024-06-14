@@ -16,6 +16,7 @@ public:
     ~ConnectionWidget();
     QTcpSocket* getTcpSocket1() const;
     QTcpSocket* getTcpSocket2() const;
+    bool isSystemConnected() const;
 
 signals:
     void connected();
@@ -30,6 +31,7 @@ private slots:
     void onSocket2Disconnected();
     void onConnected();         // Add this line
     void onDisconnected();      // Add this line
+    void onConnectionError(QAbstractSocket::SocketError socketError);
 
 private:
     Ui::ConnectionWidget *ui;
