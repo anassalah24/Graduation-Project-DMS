@@ -6,21 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>817</width>
+    <width>818</width>
     <height>113</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+background-color:#404E5C;
+}</string>
+  </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>90</x>
      <y>0</y>
      <width>151</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
    </property>
    <property name="text">
     <string>Head Pose Readings</string>
@@ -32,11 +42,16 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>490</x>
      <y>0</y>
      <width>151</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
    </property>
    <property name="text">
     <string>Eye Gaze Readings</string>
@@ -48,29 +63,62 @@
   <widget class="QWidget" name="horizontalLayoutWidget_4">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>21</y>
+     <x>420</x>
+     <y>30</y>
      <width>311</width>
-     <height>91</height>
+     <height>104</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="1" column="2">
-     <widget class="QLabel" name="eg_6">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="eg_3">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QLabel" name="eg_1">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="eg_4">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLabel" name="eg_9">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -78,41 +126,107 @@
     </item>
     <item row="0" column="1">
      <widget class="QLabel" name="eg_2">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
       <property name="text">
        <string/>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="eg_5">
-      <property name="text">
-       <string/>
+    <item row="1" column="2">
+     <widget class="QLabel" name="eg_3">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="eg_4">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="eg_7">
       <property name="text">
        <string/>
       </property>
      </widget>
     </item>
     <item row="2" column="1">
+     <widget class="QLabel" name="eg_5">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
      <widget class="QLabel" name="eg_8">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="eg_7">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
       <property name="text">
        <string/>
       </property>
      </widget>
     </item>
     <item row="2" column="2">
-     <widget class="QLabel" name="eg_9">
+     <widget class="QLabel" name="eg_6">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -123,71 +237,170 @@
   <widget class="QWidget" name="horizontalLayoutWidget_5">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>20</x>
      <y>20</y>
      <width>311</width>
-     <height>91</height>
+     <height>81</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="2">
-     <widget class="QLabel" name="hp_3">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="hp_1">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="hp_2">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="1">
-     <widget class="QLabel" name="hp_5">
-      <property name="text">
-       <string/>
+     <widget class="QLabel" name="hp_3">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="hp_4">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="hp_8">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="hp_9">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="hp_7">
       <property name="text">
        <string/>
       </property>
      </widget>
     </item>
     <item row="1" column="2">
+     <widget class="QLabel" name="hp_5">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="hp_8">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="hp_7">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="hp_4">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="hp_1">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="hp_9">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
      <widget class="QLabel" name="hp_6">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="hp_2">
+      <property name="styleSheet">
+       <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+color:white;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -195,6 +408,82 @@
     </item>
    </layout>
   </widget>
+  <widget class="QLabel" name="border_labe_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>351</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="lineWidth">
+    <number>3</number>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="border_labe_3">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>10</y>
+     <width>351</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="lineWidth">
+    <number>3</number>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>border_labe_3</zorder>
+  <zorder>border_labe_2</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>horizontalLayoutWidget_4</zorder>
+  <zorder>horizontalLayoutWidget_5</zorder>
  </widget>
  <resources/>
  <connections/>

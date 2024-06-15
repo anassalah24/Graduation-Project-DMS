@@ -13,14 +13,24 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+background-color:#404E5C;
+}</string>
+  </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>30</x>
      <y>20</y>
-     <width>151</width>
+     <width>161</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
    </property>
    <property name="text">
     <string>System Configurations</string>
@@ -35,6 +45,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
+   </property>
    <property name="text">
     <string>Frames Per Second</string>
    </property>
@@ -47,6 +62,11 @@
      <width>181</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
    </property>
    <property name="text">
     <string>Face Detection Threshhold</string>
@@ -61,6 +81,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
+   </property>
    <property name="text">
     <string>Capture Source</string>
    </property>
@@ -68,30 +93,69 @@
   <widget class="QSpinBox" name="fps_spin">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>30</x>
      <y>120</y>
      <width>161</width>
      <height>61</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QSpinBox{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QSpinBox:Hover{
+border: 2px solid #BFD7EA;
+}
+QSpinBox:focus{
+border: 2px solid white;
+}</string>
+   </property>
+   <property name="buttonSymbols">
+    <enum>QAbstractSpinBox::PlusMinus</enum>
+   </property>
    <property name="minimum">
     <number>1</number>
    </property>
    <property name="maximum">
-    <number>80</number>
+    <number>60</number>
+   </property>
+   <property name="singleStep">
+    <number>5</number>
    </property>
    <property name="value">
-    <number>10</number>
+    <number>30</number>
    </property>
   </widget>
   <widget class="QSpinBox" name="fdt_spin">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>30</x>
      <y>240</y>
      <width>161</width>
      <height>61</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QSpinBox{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QSpinBox:Hover{
+border: 2px solid #BFD7EA;
+}
+QSpinBox:focus{
+border: 2px solid white;
+}</string>
+   </property>
+   <property name="buttonSymbols">
+    <enum>QAbstractSpinBox::PlusMinus</enum>
    </property>
    <property name="singleStep">
     <number>5</number>
@@ -112,6 +176,21 @@
      <height>28</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QComboBox:Hover{
+border: 2px solid #BFD7EA;
+}
+QComboBox:focus{
+border: 2px solid white;
+}</string>
+   </property>
    <property name="currentIndex">
     <number>-1</number>
    </property>
@@ -125,6 +204,21 @@
      <height>41</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLineEdit{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QLineEdit:Hover{
+border: 2px solid #BFD7EA;
+}
+QLineEdit:focus{
+border: 2px solid white;
+}</string>
+   </property>
   </widget>
   <widget class="QPushButton" name="applybutton">
    <property name="geometry">
@@ -134,6 +228,17 @@
      <width>181</width>
      <height>61</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+background-color:#4F6272; 
+color:white;
+border-radius:20px;
+}
+
+QPushButton:Hover{
+background-color:#BFD7EA
+}</string>
    </property>
    <property name="text">
     <string>Apply Changes</string>
@@ -148,10 +253,97 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
+   </property>
    <property name="text">
     <string>Video Name</string>
    </property>
   </widget>
+  <widget class="QLabel" name="border_labe">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>221</width>
+     <height>671</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="lineWidth">
+    <number>3</number>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="border_labe_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>201</width>
+     <height>271</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="lineWidth">
+    <number>3</number>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>border_labe</zorder>
+  <zorder>border_labe_2</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>fps_spin</zorder>
+  <zorder>fdt_spin</zorder>
+  <zorder>source_combo</zorder>
+  <zorder>videoname</zorder>
+  <zorder>applybutton</zorder>
+  <zorder>label_video</zorder>
  </widget>
  <resources/>
  <connections/>

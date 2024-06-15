@@ -6,12 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1323</width>
+    <width>1344</width>
     <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow{
+background-color:#404E5C
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="verticalLayoutWidget">
@@ -79,8 +84,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1323</width>
-     <height>25</height>
+     <width>1344</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

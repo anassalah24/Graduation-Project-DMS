@@ -1,10 +1,13 @@
 #include "configswidget.h"
 #include "ui_configswidget.h"
 
-ConfigsWidget::ConfigsWidget(DataHandler *dataHandler, QWidget *parent)
+
+ConfigsWidget::ConfigsWidget(DataHandler *dataHandler, ConnectionWidget *connectionWidget,SystemControl *systemControl,QWidget *parent)
     : QWidget(parent),
     ui(new Ui::ConfigsWidget),
-    dataHandler(dataHandler)
+    dataHandler(dataHandler),
+    connectionWidget(connectionWidget),
+    systemControl (systemControl)
 {
     ui->setupUi(this);
 
@@ -42,6 +45,14 @@ void ConfigsWidget::onCaptureSourceChanged(int index) {
 }
 
 void ConfigsWidget::onApplyChangesClicked() {
+    if (!connectionWidget->isConnected()) {
+        QMessageBox::warning(this, "Connection Error", "The system is disconnected. Please connect before proceeding.");
+        return;
+    }
+    if (!systemControl->systemStatus) {
+        QMessageBox::warning(this, "System Status", "The system is currently off. Please turn it on before proceeding.");
+        return;
+    }
     // Retrieve values from UI components
     int fps = ui->fps_spin->value();
     int fdt = ui->fdt_spin->value();

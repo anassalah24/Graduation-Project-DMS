@@ -13,170 +13,88 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+background-color:#404E5C;
+}</string>
+  </property>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>40</x>
      <y>190</y>
      <width>161</width>
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
+   </property>
    <property name="text">
     <string>Face Detection Models</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="fd1">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>230</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>YoloV3 Tiny</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="fd2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>270</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>YoloV2</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="noFD">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>250</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>No Face Detection</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>50</x>
      <y>320</y>
      <width>161</width>
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
+   </property>
    <property name="text">
     <string>Head Pose Model</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="hp3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>410</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AZ</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="hp2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>380</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AY</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="hp1">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>350</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AX</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>50</x>
      <y>450</y>
      <width>161</width>
      <height>20</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
+   </property>
    <property name="text">
     <string>Eye Gaze Model</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="eg2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>510</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AY</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="eg3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>540</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AZ</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="eg1">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>480</y>
-     <width>112</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AX</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="trialLineedit">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>20</x>
      <y>590</y>
-     <width>271</width>
+     <width>211</width>
      <height>28</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLineEdit{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QLineEdit:Hover{
+border: 2px solid #BFD7EA;
+}
+QLineEdit:focus{
+border: 2px solid white;
+}</string>
    </property>
   </widget>
   <widget class="QPushButton" name="sendtrialbutton">
@@ -188,44 +106,34 @@
      <height>29</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+background-color:#4F6272; 
+color:white;
+border-radius:20px;
+}
+
+QPushButton:Hover{
+background-color:#BFD7EA
+}</string>
+   </property>
    <property name="text">
     <string>Send</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="noHP">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>380</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>No Head Pose</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="noEG">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>510</y>
-     <width>151</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>No Eye Gaze</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>60</x>
      <y>30</y>
-     <width>104</width>
+     <width>121</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
    </property>
    <property name="text">
     <string>System ON/OFF</string>
@@ -237,11 +145,16 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>70</x>
      <y>140</y>
      <width>108</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+color:white;
+}</string>
    </property>
    <property name="text">
     <string>Model Selection</string>
@@ -253,11 +166,22 @@
   <widget class="QPushButton" name="offbutton">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>130</x>
      <y>80</y>
      <width>80</width>
      <height>29</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+background-color:#4F6272; 
+color:white;
+border-radius:20px;
+}
+
+QPushButton:Hover{
+background-color:#BFD7EA
+}</string>
    </property>
    <property name="text">
     <string>OFF</string>
@@ -266,16 +190,186 @@
   <widget class="QPushButton" name="onbutton">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>30</x>
      <y>80</y>
      <width>80</width>
      <height>29</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+background-color:#4F6272; 
+color:white;
+border-radius:20px;
+}
+
+QPushButton:Hover{
+background-color:#BFD7EA
+}</string>
+   </property>
    <property name="text">
     <string>ON</string>
    </property>
   </widget>
+  <widget class="QComboBox" name="comboFaceDetection">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>230</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QComboBox:Hover{
+border: 2px solid #BFD7EA;
+}
+QComboBox:focus{
+border: 2px solid white;
+}</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboHeadPose">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>360</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QComboBox:Hover{
+border: 2px solid #BFD7EA;
+}
+QComboBox:focus{
+border: 2px solid white;
+}</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboEyeGaze">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>490</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QComboBox:Hover{
+border: 2px solid #BFD7EA;
+}
+QComboBox:focus{
+border: 2px solid white;
+}</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="border_labe">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>251</width>
+     <height>671</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="lineWidth">
+    <number>3</number>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="border_labe_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>231</width>
+     <height>421</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="lineWidth">
+    <number>3</number>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>border_labe</zorder>
+  <zorder>border_labe_2</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_5</zorder>
+  <zorder>trialLineedit</zorder>
+  <zorder>sendtrialbutton</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>offbutton</zorder>
+  <zorder>onbutton</zorder>
+  <zorder>comboFaceDetection</zorder>
+  <zorder>comboHeadPose</zorder>
+  <zorder>comboEyeGaze</zorder>
  </widget>
  <resources/>
  <connections/>
