@@ -23,7 +23,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(tcpSocket2, &QTcpSocket::disconnected, this, &ConnectionWidget::onSocket2Disconnected);
 
     connect(tcpSocket1, &QTcpSocket::errorOccurred, this, &ConnectionWidget::onConnectionError);
-    connect(tcpSocket2, &QTcpSocket::errorOccurred, this, &ConnectionWidget::onConnectionError);
+    //connect(tcpSocket2, &QTcpSocket::errorOccurred, this, &ConnectionWidget::onConnectionError);
 }
 
 ConnectionWidget::~ConnectionWidget() {
@@ -120,6 +120,6 @@ void ConnectionWidget::onDisconnected() {
     emit disconnected();
 }
 
-bool ConnectionWidget::isSystemConnected() const {
+bool ConnectionWidget::isConnected() const {
     return socket1Connected && socket2Connected;
 }

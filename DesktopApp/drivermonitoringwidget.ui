@@ -13,6 +13,11 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+background-color:#404E5C;
+}</string>
+  </property>
   <widget class="QLabel" name="faceLabel">
    <property name="geometry">
     <rect>
@@ -27,6 +32,16 @@
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::Box</enum>

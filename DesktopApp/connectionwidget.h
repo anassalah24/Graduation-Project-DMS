@@ -16,7 +16,7 @@ public:
     ~ConnectionWidget();
     QTcpSocket* getTcpSocket1() const;
     QTcpSocket* getTcpSocket2() const;
-    bool isSystemConnected() const;
+    bool isConnected() const;
 
 signals:
     void connected();

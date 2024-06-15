@@ -3,10 +3,11 @@
 #include <QButtonGroup>
 
 
-SystemControl::SystemControl(DataHandler *dataHandler, QWidget *parent) :
+SystemControl::SystemControl(DataHandler *dataHandler, ConnectionWidget *connectionWidget, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SystemControl),
-    dataHandler(dataHandler)
+    dataHandler(dataHandler),
+    connectionWidget(connectionWidget)
 {
     ui->setupUi(this);
     connect(ui->sendtrialbutton, &QPushButton::clicked, this, &SystemControl::onSendButtonClicked);
@@ -33,6 +34,16 @@ SystemControl::~SystemControl()
 }
 
 void SystemControl::onSendButtonClicked() {
+
+    if (!connectionWidget->isConnected()) {
+        QMessageBox::warning(this, "Connection Error", "The system is disconnected. Please connect before proceeding.");
+        return;
+    }
+    if (!systemStatus) {
+        QMessageBox::warning(this, "System Status", "The system is currently off. Please turn it on before proceeding.");
+        return;
+    }
+
     // Retrieve selected options from the combo boxes
     QString faceDetectionModel = ui->comboFaceDetection->currentText();
     QString headPoseModel = ui->comboHeadPose->currentText();
@@ -67,6 +78,10 @@ void SystemControl::onSendButtonClicked() {
 
 
 void SystemControl::onSystemOnClicked() {
+    if (!connectionWidget->isConnected()) {
+        QMessageBox::warning(this, "Connection Error", "The system is disconnected. Please connect before proceeding.");
+        return;
+    }
     QString message = "TURN_ON";
     QByteArray data = message.toUtf8();
 
@@ -75,9 +90,15 @@ void SystemControl::onSystemOnClicked() {
     data.prepend(reinterpret_cast<const char*>(&messageSize), sizeof(int));
 
     dataHandler->sendData(data);
+    systemStatus = true;
 }
 
 void SystemControl::onSystemOffClicked() {
+    if (!connectionWidget->isConnected()) {
+        QMessageBox::warning(this, "Connection Error", "The system is disconnected. Please connect before proceeding.");
+        return;
+    }
+
     QString message = "TURN_OFF";
     QByteArray data = message.toUtf8();
 
@@ -86,4 +107,5 @@ void SystemControl::onSystemOffClicked() {
     data.prepend(reinterpret_cast<const char*>(&messageSize), sizeof(int));
 
     dataHandler->sendData(data);
+    systemStatus = false;
 }

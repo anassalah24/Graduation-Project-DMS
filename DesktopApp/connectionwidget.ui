@@ -6,21 +6,41 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1339</width>
-    <height>50</height>
+    <width>1383</width>
+    <height>87</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+background-color:#404E5C;
+}</string>
+  </property>
   <widget class="QLineEdit" name="ipLineEdit">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
+     <x>20</x>
+     <y>20</y>
      <width>381</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLineEdit{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QLineEdit:Hover{
+border: 2px solid #BFD7EA;
+}
+QLineEdit:focus{
+border: 2px solid white;
+}</string>
    </property>
    <property name="placeholderText">
     <string>Enter IP Address...</string>
@@ -29,11 +49,26 @@
   <widget class="QLineEdit" name="portLineEdit">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>10</y>
+     <x>430</x>
+     <y>20</y>
      <width>191</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLineEdit{
+border: 2px solid #4F6272;
+border-radius:20px;
+color:white;
+padding-left:10px;
+	background-color: rgb(79, 98, 114);
+}
+QLineEdit:Hover{
+border: 2px solid #BFD7EA;
+}
+QLineEdit:focus{
+border: 2px solid white;
+}</string>
    </property>
    <property name="placeholderText">
     <string>Enter Port Number...</string>
@@ -42,11 +77,22 @@
   <widget class="QPushButton" name="connectButton">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>10</y>
+     <x>660</x>
+     <y>20</y>
      <width>151</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+background-color:#4F6272; 
+color:white;
+border-radius:20px;
+}
+
+QPushButton:Hover{
+background-color:#BFD7EA
+}</string>
    </property>
    <property name="text">
     <string>Connect</string>
@@ -55,11 +101,22 @@
   <widget class="QPushButton" name="disconnectButton">
    <property name="geometry">
     <rect>
-     <x>830</x>
-     <y>10</y>
+     <x>840</x>
+     <y>20</y>
      <width>151</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+background-color:#4F6272; 
+color:white;
+border-radius:20px;
+}
+
+QPushButton:Hover{
+background-color:#BFD7EA
+}</string>
    </property>
    <property name="text">
     <string>Disconnect</string>
@@ -68,9 +125,9 @@
   <widget class="QLabel" name="statusLabel">
    <property name="geometry">
     <rect>
-     <x>1000</x>
-     <y>10</y>
-     <width>331</width>
+     <x>1010</x>
+     <y>20</y>
+     <width>251</width>
      <height>31</height>
     </rect>
    </property>
@@ -81,6 +138,47 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QLabel" name="border_labe_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>1271</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel{
+border: 2px solid #4F6272;
+border-radius:20px;
+padding-left:10px;
+}
+QLabel:Hover{
+border: 2px solid #BFD7EA;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Box</enum>
+   </property>
+   <property name="lineWidth">
+    <number>3</number>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>border_labe_2</zorder>
+  <zorder>ipLineEdit</zorder>
+  <zorder>portLineEdit</zorder>
+  <zorder>connectButton</zorder>
+  <zorder>disconnectButton</zorder>
+  <zorder>statusLabel</zorder>
  </widget>
  <resources/>
  <connections/>

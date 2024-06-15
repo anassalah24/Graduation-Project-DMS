@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include "datahandler.h"
+#include <QMessageBox>
+#include "connectionwidget.h"
 
 
 namespace Ui {
@@ -14,8 +16,9 @@ class SystemControl : public QWidget
     Q_OBJECT
 
 public:
-    explicit SystemControl(DataHandler *dataHandler, QWidget *parent = nullptr);
+    explicit SystemControl(DataHandler *dataHandler,ConnectionWidget *connectionWidget, QWidget *parent = nullptr);
     ~SystemControl();
+    bool systemStatus=true;
 
 
 private slots:
@@ -26,6 +29,8 @@ private slots:
 private:
     Ui::SystemControl *ui;
     DataHandler *dataHandler;
+    ConnectionWidget *connectionWidget;
+
 };
 
 #endif // SYSTEMCONTROL_H

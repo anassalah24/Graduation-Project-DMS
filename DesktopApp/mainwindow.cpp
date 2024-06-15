@@ -19,14 +19,14 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create the DataHandler and connect it to the sockets from the ConnectionWidget
     dataHandler = new DataHandler(connectionWidget->getTcpSocket1(), connectionWidget->getTcpSocket2(), this);
 
-    // Create the ConfigsWidget and pass the DataHandler to it
-    configsWidget = new ConfigsWidget(dataHandler, this);
-    ui->cfgs_layout->addWidget(configsWidget);
-
 
     // Create the SystemControlWidget and pass the DataHandler to it
-    systemcontrol = new SystemControl(dataHandler, this);
+    systemcontrol = new SystemControl(dataHandler,connectionWidget, this);
     ui->sysctrl_layout->addWidget(systemcontrol);
+
+    // Create the ConfigsWidget and pass the DataHandler to it
+    configsWidget = new ConfigsWidget(dataHandler,connectionWidget,systemcontrol, this);
+    ui->cfgs_layout->addWidget(configsWidget);
 
     // Connect the faceReceived signal to the updateFaceDisplay slot
     connect(dataHandler, &DataHandler::faceReceived, driverMonitoringWidget, &DriverMonitoringWidget::updateFaceDisplay);
