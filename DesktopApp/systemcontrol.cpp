@@ -34,6 +34,7 @@ SystemControl::~SystemControl()
 }
 
 void SystemControl::onSendButtonClicked() {
+
     if (!connectionWidget->isConnected()) {
         QMessageBox::warning(this, "Connection Error", "The system is disconnected. Please connect before proceeding.");
         return;
@@ -42,6 +43,7 @@ void SystemControl::onSendButtonClicked() {
         QMessageBox::warning(this, "System Status", "The system is currently off. Please turn it on before proceeding.");
         return;
     }
+
     // Retrieve selected options from the combo boxes
     QString faceDetectionModel = ui->comboFaceDetection->currentText();
     QString headPoseModel = ui->comboHeadPose->currentText();

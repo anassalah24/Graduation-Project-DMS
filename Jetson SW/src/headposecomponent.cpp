@@ -4,10 +4,11 @@
 
 TRTEngineSingleton* TRTEngineSingleton::instance = nullptr;
 
+
+
 //constructor
 HeadPoseComponent::HeadPoseComponent(ThreadSafeQueue<cv::Mat>& inputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue, ThreadSafeQueue<std::vector<std::vector<float>>>& outputQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
 : inputQueue(inputQueue), faceRectQueue(faceRectQueue), outputQueue(outputQueue),framesQueue(framesQueue) ,commandsQueue(commandsQueue),faultsQueue(faultsQueue), running(false) {}
-
 
 
 //destructor
@@ -75,7 +76,7 @@ std::vector<std::vector<float>> HeadPoseComponent::detectHeadPose(cv::Mat& cropp
     std::vector<std::vector<float>> out = trt->infer(croppedFace);
     auto end = std::chrono::high_resolution_clock::now();
     double engineTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "Head pose time: " << engineTime << " ms" << std::endl;
+    std::cout << "AI Models combined time: " << engineTime << " ms" << std::endl;
     return out;
 }
 
@@ -153,6 +154,8 @@ void HeadPoseComponent::updatePerformanceMetrics(double detectionTime) {
     }
 }
 
+
+
 void HeadPoseComponent::displayPerformanceMetrics(cv::Mat& frame) {
     std::string fpsText = "FPS: " + std::to_string(int(fps));
     std::string avgTimeText = "Avg Time: " + std::to_string(totalDetectionTime / totalFramesProcessed) + " ms";
@@ -161,6 +164,24 @@ void HeadPoseComponent::displayPerformanceMetrics(cv::Mat& frame) {
     //cv::putText(frame, avgTimeText, cv::Point(20, 80), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
     //std::cout << fpsText << std::endl;
     //std::cout << avgTimeText << std::endl;
+}
+
+
+
+
+
+// Update the engine for head pose detection
+void HeadPoseComponent::updateHeadPoseEngine(const std::string& headPoseEnginePath) {
+    TRTEngineSingleton* trt = TRTEngineSingleton::getInstance();
+    trt->setEngine1(headPoseEnginePath);
+    std::cout << "Head pose engine updated successfully." << std::endl;
+}
+
+// Update the engine for eye gaze detection
+void HeadPoseComponent::updateEyeGazeEngine(const std::string& eyeGazeEnginePath) {
+    TRTEngineSingleton* trt = TRTEngineSingleton::getInstance();
+    trt->setEngine2(eyeGazeEnginePath);
+    std::cout << "Eye gaze engine updated successfully." << std::endl;
 }
 
 
