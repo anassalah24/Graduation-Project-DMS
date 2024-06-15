@@ -37,7 +37,6 @@ public:
     }
 
     void loadEngines() {
-        //std::lock_guard<std::mutex> lock(mtx); // Lock during engine loading
         engine1 = loadEngine("/home/dms/DMS/ModularCode/include/Ay.engine");
         engine2 = loadEngine("/home/dms/DMS/ModularCode/modelconfigs/mobilenetv3_engine.engine");
 		std::cout << "loaded engines successfullyyyyyyyyyyyyyyyyyyyyyyyyyy " << std::endl;
@@ -46,65 +45,62 @@ public:
         }
     }
 
-	// Set new engine for head pose
 	void setEngine1(const std::string& enginePath) {
-		std::lock_guard<std::mutex> lock(mtx); // Ensure thread safety during engine swap
+		std::lock_guard<std::mutex> lock(mtx);
+		if (enginePath == "No Head Pose") {
+			std::cout << "Skipping load of head pose engine." << std::endl;
+			if (engine1) {
+				engine1->destroy();
+				engine1 = nullptr;
+			}
+			return;
+		}
 		std::cout << "Loading new engine for head pose from: " << enginePath << std::endl;
-
-		// First, safely destroy any existing engine
 		if (engine1) {
-		    std::cout << "Destroying old engine for head pose." << std::endl;
-		    engine1->destroy();
-		    engine1 = nullptr; // Clear the old pointer after destruction
+		engine1->destroy();
+		engine1 = nullptr;
 		}
-
-		// Load the new engine
 		ICudaEngine* newEngine = loadEngine(enginePath);
 		if (newEngine) {
-		    engine1 = newEngine;
-		    std::cout << "Updated engine for head pose successfully." << std::endl;
+		engine1 = newEngine;
+		std::cout << "Updated engine for head pose successfully." << std::endl;
 		} else {
-		    std::cerr << "Failed to load new engine for head pose from: " << enginePath << std::endl;
+		std::cerr << "Failed to load new engine for head pose from: " << enginePath << std::endl;
 		}
 	}
 
-	// Set new engine for eye gaze
 	void setEngine2(const std::string& enginePath) {
-		std::lock_guard<std::mutex> lock(mtx); // Ensure thread safety during engine swap
+		std::lock_guard<std::mutex> lock(mtx);
+		if (enginePath == "No Eye Gaze") {
+			std::cout << "Skipping load of eye gaze engine." << std::endl;
+			if (engine2) {
+				engine2->destroy();
+				engine2 = nullptr;
+			}
+			return;
+			}
 		std::cout << "Loading new engine for eye gaze from: " << enginePath << std::endl;
-
-		// First, safely destroy any existing engine
 		if (engine2) {
-		    std::cout << "Destroying old engine for eye gaze." << std::endl;
-		    engine2->destroy();
-		    engine2 = nullptr; // Clear the old pointer after destruction
+		engine2->destroy();
+		engine2 = nullptr;
 		}
-
-		// Load the new engine
 		ICudaEngine* newEngine = loadEngine(enginePath);
 		if (newEngine) {
-		    engine2 = newEngine;
-		    std::cout << "Updated engine for eye gaze successfully." << std::endl;
+		engine2 = newEngine;
+		std::cout << "Updated engine for eye gaze successfully." << std::endl;
 		} else {
-		    std::cerr << "Failed to load new engine for eye gaze from: " << enginePath << std::endl;
+		std::cerr << "Failed to load new engine for eye gaze from: " << enginePath << std::endl;
 		}
 	}
-
 
     std::vector<std::vector<float>> infer(const cv::Mat& frame) {
-		std::lock_guard<std::mutex> lock(mtx); // Protect inference process
 
-		if (!engine1 || !engine2) {
-		    std::cerr << "Engine not loaded, skipping inference." << std::endl;
-		    return {{-1}, {-1}};
-		}
-        // Create execution contexts
-        IExecutionContext* context1 = engine1->createExecutionContext();
-        IExecutionContext* context2 = engine2->createExecutionContext();
-        if (!context1 || !context2) {
-            std::cerr << "Failed to create execution context" << std::endl;
-            return {{-1}, {-1}};
-        }
+		std::lock_guard<std::mutex> lock(mtx); // Protect inference process
+		std::vector<float> defaultOutput(9, -100); // Default output when engine is skipped
+		std::vector<std::vector<float>> results(2, defaultOutput); // Create execution contexts
+		// Create execution contexts
+		IExecutionContext* context1 = engine1 ? engine1->createExecutionContext() : nullptr;
+		IExecutionContext* context2 = engine2 ? engine2->createExecutionContext() : nullptr;
 
         // Read and preprocess image using OpenCV
         cv::Mat image = frame;
@@ -146,29 +142,36 @@ public:
         // Copy preprocessed image data to GPU
         cudaMemcpy(gpuInputBuffer, resizedImage.ptr<float>(), inputSize * sizeof(float), cudaMemcpyHostToDevice);
 
-        // Do inference for the first model
-        void* buffers1[] = {gpuInputBuffer, gpuOutputBuffer1};
-        context1->executeV2(buffers1);
+		// Inference for the first model
+		if (context1) {
+		    void* buffers1[] = {gpuInputBuffer, gpuOutputBuffer1};
+		    context1->executeV2(buffers1);
 
-        // Do inference for the second model
-        void* buffers2[] = {gpuInputBuffer, gpuOutputBuffer2};
-        context2->executeV2(buffers2);
+		    // Copy output data from GPU
+		    cudaMemcpy(results[0].data(), gpuOutputBuffer1, outputSize1 * sizeof(float), cudaMemcpyDeviceToHost);
+		} else {
+		    std::cerr << "Head pose engine not loaded, using default values." << std::endl;
+		}
 
-        // Copy output data from GPU
-        std::vector<float> outputData1(batchSize * outputSize1);
-        std::vector<float> outputData2(batchSize * outputSize2);
+		// Inference for the second model
+		if (context2) {
+		    void* buffers2[] = {gpuInputBuffer, gpuOutputBuffer2};
+		    context2->executeV2(buffers2);
 
-        // Copy data from GPU to host using cudaMemcpy
-        cudaMemcpy(outputData1.data(), gpuOutputBuffer1, batchSize * outputSize1 * sizeof(float), cudaMemcpyDeviceToHost);
-        cudaMemcpy(outputData2.data(), gpuOutputBuffer2, batchSize * outputSize2 * sizeof(float), cudaMemcpyDeviceToHost);
+		    // Copy output data from GPU
+		    cudaMemcpy(results[1].data(), gpuOutputBuffer2, outputSize2 * sizeof(float), cudaMemcpyDeviceToHost);
+		} else {
+		    std::cerr << "Eye gaze engine not loaded, using default values." << std::endl;
+		}
 
         cudaFree(gpuInputBuffer);
         cudaFree(gpuOutputBuffer1);
         cudaFree(gpuOutputBuffer2);
-        context1->destroy();
-        context2->destroy();
+    	if (context1) context1->destroy();
+    	if (context2) context2->destroy();
 
-        return {outputData1, outputData2};
+        return results;
+
         // No need to destroy the engines here since they're managed by the singleton
     }
 

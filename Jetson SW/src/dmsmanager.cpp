@@ -213,15 +213,25 @@ void DMSManager::handlecommand(std::string& command) {
 		{"eff0", "/home/dms/DMS/ModularCode/include/eff0.engine"},
 		{"eff1", "/home/dms/DMS/ModularCode/include/eff1.engine"},
 		{"eff2", "/home/dms/DMS/ModularCode/include/eff2.engine"},
-		{"eff3", "/home/dms/DMS/ModularCode/include/eff3.engine"}
+		{"eff3", "/home/dms/DMS/ModularCode/include/eff3.engine"},
+		{"No Head Pose", "No Head Pose"}
 	};
+
 
 	std::map<std::string, std::string> eyeGazeModels = {
 		{"mobilenetv3", "/home/dms/DMS/ModularCode/modelconfigs/mobilenetv3_engine.engine"},
 		{"squeezenet", "/home/dms/DMS/ModularCode/modelconfigs/squeezenet.engine"},
 		{"resnet", "/home/dms/DMS/ModularCode/include/resnet_engine.engine"},
-		{"mobilenet", "/home/dms/DMS/ModularCode/include/mobilenet_engine.engine"}
+		{"mobilenet", "/home/dms/DMS/ModularCode/include/mobilenet_engine.engine"},
+		{"No Eye Gaze", "No Eye Gaze"}
 	};
+
+    std::map<std::string, std::pair<std::string, std::string>> faceDetectionModels = {
+        {"YoloV3 Tiny", {"/home/dms/DMS/ModularCode/modelconfigs/face-yolov3-tiny.cfg", "/home/dms/DMS/ModularCode/modelconfigs/face-yolov3-tiny_41000.weights"}},
+        {"YoloV2", {"/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.weights"}},
+        {"No Face Detection", {"No Face Detection", "No Face Detection"}},
+        // Add more models as needed
+    };
 
     //setting FPS
     if (command.find("SET_FPS:") != std::string::npos) {
@@ -286,39 +296,61 @@ void DMSManager::handlecommand(std::string& command) {
         if (pos != std::string::npos) {
             std::string modelValue = command.substr(pos + 1);
             std::cout << "Setting Face Detection Model to: " << modelValue << std::endl;
-	    //implement model changes
+            auto it = faceDetectionModels.find(modelValue);
+            if (it != faceDetectionModels.end()) {
+                std::string weightPath = it->second.second;
+                std::string configPath = it->second.first;
+				if (weightPath == "No Face Detection" && configPath == "No Face Detection"){
+					faceDetectionComponent.modelstatus = false;
+		            std::cout << "Updated Face Detection Model and Config to: " << weightPath << " and " << configPath << std::endl;
+		            clearQueues();
+				} 
+				else{
+					faceDetectionComponent.stopDetection();
+		            faceDetectionComponent.initialize(configPath,weightPath);
+					faceDetectionComponent.modelstatus = true;
+					faceDetectionComponent.startDetection();
+		            std::cout << "Updated Face Detection Model and Config to: " << weightPath << " and " << configPath << std::endl;
+		            clearQueues();
+				}
+            } else {
+                std::cerr << "Face detection model identifier not recognized: " << modelValue << std::endl;
+            }
         } else {
             std::cerr << "Invalid SET_FD_MODEL command format: " << command << std::endl;
         }
-    
+
+    // Handling Head Pose Model
 	}else if (command.find("SET_HP_MODEL:") != std::string::npos) {
 		size_t pos = command.find(":");
 		if (pos != std::string::npos) {
-		    std::string modelValue = command.substr(pos + 1);
-		    std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
-		    if (headPoseModels.find(modelValue) != headPoseModels.end()) {
-		        headposeComponent.updateHeadPoseEngine(headPoseModels[modelValue]);
+			std::string modelValue = command.substr(pos + 1);
+			std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
+			if (headPoseModels.find(modelValue) != headPoseModels.end()) {
+			    headposeComponent.updateHeadPoseEngine(headPoseModels[modelValue]);
 				clearQueues();
-		    } else {
-		        std::cerr << "Head pose model identifier not recognized: " << modelValue << std::endl;
-		    }
+			} else {
+			    std::cerr << "Head pose model identifier not recognized: " << modelValue << std::endl;
+			}
 		} else {
-		    std::cerr << "Invalid SET_HP_MODEL command format: " << command << std::endl;
+			std::cerr << "Invalid SET_HP_MODEL command format: " << command << std::endl;
 		}
-	} else if (command.find("SET_EG_MODEL:") != std::string::npos) {
+
+    // Handling eye gaze Model
+	}else if (command.find("SET_EG_MODEL:") != std::string::npos) {
 		size_t pos = command.find(":");
 		if (pos != std::string::npos) {
-		    std::string modelValue = command.substr(pos + 1);
-		    std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
-		    if (eyeGazeModels.find(modelValue) != eyeGazeModels.end()) {
-		        headposeComponent.updateEyeGazeEngine(eyeGazeModels[modelValue]);
+			std::string modelValue = command.substr(pos + 1);
+			std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
+			if (eyeGazeModels.find(modelValue) != eyeGazeModels.end()) {
+			    headposeComponent.updateEyeGazeEngine(eyeGazeModels[modelValue]);
 				clearQueues();
-		    } else {
-		        std::cerr << "Eye gaze model identifier not recognized: " << modelValue << std::endl;
-		    }
-		}else {
-        std::cerr << "Invalid SET_EG_MODEL command format: " << command << std::endl;
-    	}
+			} else {
+			    std::cerr << "Eye gaze model identifier not recognized: " << modelValue << std::endl;
+			}
+		} else {
+		    std::cerr << "Invalid SET_EG_MODEL command format: " << command << std::endl;
+			}
 
    // Handle unknown command
     } else { 
