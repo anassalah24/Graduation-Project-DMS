@@ -65,7 +65,7 @@ void CommTCPComponent::frameServerLoop() {
             std::cout << "Client connected to frame server: socket FD " << newSocket << std::endl;
             std::thread(&CommTCPComponent::handleFrameClient, this, newSocket).detach();
         } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
     close(serverFd);
@@ -94,114 +94,145 @@ void CommTCPComponent::commandServerLoop() {
             std::cout << "Client connected to command server: socket FD " << newSocket << std::endl;
             std::thread(&CommTCPComponent::handleCommandClient, this, newSocket).detach();
         } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
     close(serverFd);
 }
 
-// Handle frame transmission to a client
 void CommTCPComponent::handleFrameClient(int clientSocket) {
-    cv::Mat frame;
-    while (running) {
-        if (outputQueue.tryPop(frame) && !frame.empty()) {
-            std::vector<uchar> buffer;
-            cv::imencode(".jpg", frame, buffer);
-            auto bufferSize = htonl(buffer.size()); // Convert to network byte order
-            send(clientSocket, &bufferSize, sizeof(bufferSize), 0);
-            send(clientSocket, buffer.data(), buffer.size(), 0);
+    try {
+        cv::Mat frame;
+        while (running) {
+            if (outputQueue.tryPop(frame) && !frame.empty()) {
+                std::vector<uchar> buffer;
+                cv::imencode(".jpg", frame, buffer);
+                auto bufferSize = htonl(buffer.size()); // Convert to network byte order
+                
+                ssize_t bytesSent = send(clientSocket, &bufferSize, sizeof(bufferSize), 0);
+                if (bytesSent == -1 || bytesSent == 0) {
+                    throw std::runtime_error("Failed to send frame size");
+                }
+                
+                bytesSent = send(clientSocket, buffer.data(), buffer.size(), 0);
+                if (bytesSent == -1 || bytesSent == 0) {
+                    throw std::runtime_error("Failed to send frame data");
+                }
+            }
         }
+        close(clientSocket);
+    } catch (const std::exception& e) {
+        std::cerr << "Exception in handleFrameClient: " << e.what() << std::endl;
+        close(clientSocket); // Ensure the socket is closed on error
     }
-    close(clientSocket);
 }
 
 // Handle command reception and readings data transmission to a client
 void CommTCPComponent::handleCommandClient(int clientSocket) {
-    std::vector<std::vector<float>> reading;
+    try{
+		std::vector<std::vector<float>> reading;
 
-    while (running) {
-        // Handle readings data transmission
-        if (readingsQueue.tryPop(reading) && !reading.empty()) {
-            std::vector<uint8_t> serializedData = serialize(reading);
-            send(clientSocket, serializedData.data(), serializedData.size(), 0);
-        }
+		while (running) {
+		    // Handle readings data transmission
+		    if (readingsQueue.tryPop(reading) && !reading.empty()) {
+		        std::vector<uint8_t> serializedData = serialize(reading);
+		        ssize_t bytesSent = send(clientSocket, serializedData.data(), serializedData.size(), 0);
+		        if (bytesSent == -1 || bytesSent == 0) {
+		            std::cerr << "Failed to send reading data. Error: " << strerror(errno) << std::endl;
+		            close(clientSocket);
+		            return; // Exit the thread
+		        }
+		        //send(clientSocket, serializedData.data(), serializedData.size(), 0);
+		    }
 
-        // Handle configuration messages
-        char buffer[1024] = {0};
-        ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), MSG_DONTWAIT);
+		    // Handle configuration messages
+		    char buffer[1024] = {0};
+		    //ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), MSG_DONTWAIT);
+		    ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), MSG_DONTWAIT);
+		    
+		    if (bytesRead == -1 || bytesRead == 0) {
+		        if (errno != EWOULDBLOCK) {
+		            std::cerr << "Failed to receive data. Error: " << strerror(errno) << std::endl;
+		            close(clientSocket);
+		            return; // Exit the thread
+		        }
 
-        if (bytesRead > 0) {
-            const char* ptr = buffer;
-            const char* end = buffer + bytesRead;
+		    }else if (bytesRead > 0) {
+		        const char* ptr = buffer;
+		        const char* end = buffer + bytesRead;
 
-            while (ptr < end) {
-                // Read the length of the next message
-                int messageLength = 0;
-                std::memcpy(&messageLength, ptr, sizeof(int));
-                ptr += sizeof(int);
+		        while (ptr < end) {
+		            // Read the length of the next message
+		            int messageLength = 0;
+		            std::memcpy(&messageLength, ptr, sizeof(int));
+		            ptr += sizeof(int);
 
-                // Ensure we have enough data for the message
-                if (ptr + messageLength > end) {
-                    std::cerr << "Incomplete message received" << std::endl;
-                    break;
-                }
+		            // Ensure we have enough data for the message
+		            if (ptr + messageLength > end) {
+		                std::cerr << "Incomplete message received" << std::endl;
+		                break;
+		            }
 
-                // Extract the message
-                std::string message(ptr, messageLength);
-                ptr += messageLength;
+		            // Extract the message
+		            std::string message(ptr, messageLength);
+		            ptr += messageLength;
 
-                // Process the message
-                if (message.find("SET_FPS") != std::string::npos) {
-                    // Handle FPS configuration
-                    std::cout << "Received SET_FPS command with value: " << message.substr(8) << std::endl;
-                    std::string command = "SET_FPS:" + message.substr(8);
-                    commandsQueue.push(command);
+		            // Process the message
+		            if (message.find("SET_FPS") != std::string::npos) {
+		                // Handle FPS configuration
+		                std::cout << "Received SET_FPS command with value: " << message.substr(8) << std::endl;
+		                std::string command = "SET_FPS:" + message.substr(8);
+		                commandsQueue.push(command);
 
-                } else if (message == "TURN_OFF") {
-                    // Handle turning off the system
-                    std::cout << "Received TURN_OFF command" << std::endl;
-                    std::string command = "TURN_OFF";
-                    commandsQueue.push(command);
+		            } else if (message == "TURN_OFF") {
+		                // Handle turning off the system
+		                std::cout << "Received TURN_OFF command" << std::endl;
+		                std::string command = "TURN_OFF";
+		                commandsQueue.push(command);
 
-                } else if (message == "TURN_ON") {
-                    // Handle turning on the system
-                    std::cout << "Received TURN_ON command" << std::endl;
-                    std::string command = "TURN_ON";
-                    commandsQueue.push(command);
+		            } else if (message == "TURN_ON") {
+		                // Handle turning on the system
+		                std::cout << "Received TURN_ON command" << std::endl;
+		                std::string command = "TURN_ON";
+		                commandsQueue.push(command);
 
-                } else if (message.find("SET_FDT") != std::string::npos) {
-                    // Handle FDT configuration
-                    std::cout << "Received SET_FDT command with value: " << message.substr(8) << std::endl;
-                    std::string command = "SET_FDT:" + message.substr(8);
-                    commandsQueue.push(command);
+		            } else if (message.find("SET_FDT") != std::string::npos) {
+		                // Handle FDT configuration
+		                std::cout << "Received SET_FDT command with value: " << message.substr(8) << std::endl;
+		                std::string command = "SET_FDT:" + message.substr(8);
+		                commandsQueue.push(command);
 
-		} else if (message.find("SET_SOURCE") != std::string::npos) {
-                    // Handle FDT configuration
-                    std::cout << "Received SET_SOURCE command with value: " << message.substr(11) << std::endl;
-                    std::string command = "SET_SOURCE:" + message.substr(11);
-                    commandsQueue.push(command);
+			} else if (message.find("SET_SOURCE") != std::string::npos) {
+		                // Handle FDT configuration
+		                std::cout << "Received SET_SOURCE command with value: " << message.substr(11) << std::endl;
+		                std::string command = "SET_SOURCE:" + message.substr(11);
+		                commandsQueue.push(command);
 
-                } else if (message.find("SET_FD_MODEL") != std::string::npos) {
-                    std::cout << "Received SET_FD_MODEL command with value: " << message.substr(13) << std::endl;
-                    commandsQueue.push("SET_FD_MODEL:" + message.substr(13));
+		            } else if (message.find("SET_FD_MODEL") != std::string::npos) {
+		                std::cout << "Received SET_FD_MODEL command with value: " << message.substr(13) << std::endl;
+		                commandsQueue.push("SET_FD_MODEL:" + message.substr(13));
 
-                } else if (message.find("SET_HP_MODEL") != std::string::npos) {
-                    std::cout << "Received SET_HP_MODEL command with value: " << message.substr(13) << std::endl;
-                    commandsQueue.push("SET_HP_MODEL:" + message.substr(13));
+		            } else if (message.find("SET_HP_MODEL") != std::string::npos) {
+		                std::cout << "Received SET_HP_MODEL command with value: " << message.substr(13) << std::endl;
+		                commandsQueue.push("SET_HP_MODEL:" + message.substr(13));
 
-                } else if (message.find("SET_EG_MODEL") != std::string::npos) {
-                    std::cout << "Received SET_EG_MODEL command with value: " << message.substr(13) << std::endl;
-                    commandsQueue.push("SET_EG_MODEL:" + message.substr(13));
+		            } else if (message.find("SET_EG_MODEL") != std::string::npos) {
+		                std::cout << "Received SET_EG_MODEL command with value: " << message.substr(13) << std::endl;
+		                commandsQueue.push("SET_EG_MODEL:" + message.substr(13));
 
-                } else {
-                    std::cout << "Received unknown command: " << message << std::endl;
-                }
-            }
-        }
+		            } else {
+		                std::cout << "Received unknown command: " << message << std::endl;
+		            }
+		        }
+		    }
+		}
+
+		close(clientSocket);
+    }catch (const std::exception& e) {
+        std::cerr << "Exception in handleCommandClient: " << e.what() << std::endl;
+        close(clientSocket); // Ensure the socket is closed on error
     }
-
-    close(clientSocket);
-}
+	}
 // Serialize a 2D vector of floats to a byte array
 std::vector<uint8_t> CommTCPComponent::serialize(const std::vector<std::vector<float>>& data) {
     std::vector<uint8_t> buffer;
