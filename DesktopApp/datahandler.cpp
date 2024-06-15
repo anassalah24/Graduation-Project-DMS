@@ -8,9 +8,14 @@
 DataHandler::DataHandler(QTcpSocket *socket1, QTcpSocket *socket2, QObject *parent) : QObject(parent), tcpSocket1(socket1), tcpSocket2(socket2) {
     connect(tcpSocket1, &QTcpSocket::readyRead, this, &DataHandler::onDataReady1);
     connect(tcpSocket2, &QTcpSocket::readyRead, this, &DataHandler::onDataReady2);
+
     frameCheckTimer = new QTimer(this);
     connect(frameCheckTimer, &QTimer::timeout, this, &DataHandler::checkFrameReception);
     frameCheckTimer->start(1000); // Check every second
+
+    readingsCheckTimer = new QTimer(this);
+    connect(readingsCheckTimer, &QTimer::timeout, this, &DataHandler::checkReadingsReception);
+    readingsCheckTimer->start(1000); // Check every second
 }
 
 DataHandler::~DataHandler() {
@@ -53,6 +58,7 @@ void DataHandler::onDataReady1() {
 
 
 void DataHandler::onDataReady2() {
+    readingsReceivedSinceLastCheck = true;
     // Read all available data from the second socket
     QByteArray data = tcpSocket2->readAll();
 
@@ -130,3 +136,13 @@ void DataHandler::checkFrameReception() {
     }
     frameReceivedSinceLastCheck = false; // Reset the flag for the next interval
 }
+
+void DataHandler::checkReadingsReception() {
+    if (!readingsReceivedSinceLastCheck) {
+        // Emit a signal with default invalid data
+        std::vector<std::vector<float>> invalidData(2, std::vector<float>(9, -100));
+        emit readingsReceived(invalidData);
+    }
+    readingsReceivedSinceLastCheck = false; // Reset the flag
+}
+
