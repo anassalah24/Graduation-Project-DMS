@@ -10,6 +10,8 @@
 #include "vehiclestatemanager.h"
 #include "postprocessingcomponent.h"
 #include "faultmanager.h"
+#include <signal.h>
+
 
 class DMSManager {
 public:
@@ -35,6 +37,8 @@ public:
     void setFaceFDT(int fdt);
     void setCamereSource(const std::string& source);
     void clearQueues();
+    void setupSignalHandlers();
+
 
 
     // function to handle the different types of commands send by the windows app

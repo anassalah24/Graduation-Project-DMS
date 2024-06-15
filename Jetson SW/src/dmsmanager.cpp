@@ -40,7 +40,9 @@ bool DMSManager::startSystem() {
     //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
     headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
     //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
+
     tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
+
     //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
     //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
     commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
@@ -119,6 +121,11 @@ void DMSManager::stopSystem() {
 }
 
 
+
+void DMSManager::setupSignalHandlers() {
+    signal(SIGPIPE, SIG_IGN);  // Ignore SIGPIPE
+}
+
 //component loops that start in their own thread
 void DMSManager::cameraLoop() {
     cameraComponent.startCapture();
@@ -139,6 +146,7 @@ void DMSManager::eyegazeLoop() {
     eyegazeComponent.startEyeGazeDetection();
 }
 void DMSManager::commtcpLoop() {
+    setupSignalHandlers();
     tcpComponent.startServer();
 }
 void DMSManager::vehicleStateLoop() {
