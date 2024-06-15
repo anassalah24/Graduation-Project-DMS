@@ -21,12 +21,13 @@ public:
 
 signals:
     void faceReceived(QImage faceImage);
-    void readingsReceived(const std::vector<std::vector<float>>& readings);  // New signal for deserialized readings
+    void readingsReceived(std::vector<std::vector<float>> readings);
 
 private slots:
     void onDataReady1();
     void onDataReady2();
     void checkFrameReception();
+    void checkReadingsReception();
 
 
 private:
@@ -35,7 +36,9 @@ private:
     QImage matToQImage(const cv::Mat &mat);
     std::vector<std::vector<float>> deserialize(const std::vector<uint8_t>& buffer);
     QTimer *frameCheckTimer;
+    QTimer *readingsCheckTimer;
     bool frameReceivedSinceLastCheck = false;
+    bool readingsReceivedSinceLastCheck = false;
 };
 
 #endif // DATAHANDLER_H
