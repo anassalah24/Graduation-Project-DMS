@@ -76,7 +76,7 @@ std::vector<std::vector<float>> HeadPoseComponent::detectHeadPose(cv::Mat& cropp
     std::vector<std::vector<float>> out = trt->infer(croppedFace);
     auto end = std::chrono::high_resolution_clock::now();
     double engineTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "Head pose time: " << engineTime << " ms" << std::endl;
+    std::cout << "AI Models combined time: " << engineTime << " ms" << std::endl;
     return out;
 }
 

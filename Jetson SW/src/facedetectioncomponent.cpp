@@ -50,6 +50,10 @@ void FaceDetectionComponent::detectionLoop() {
     while (running) {
         if (inputQueue.tryPop(frame)) {
             auto start = std::chrono::high_resolution_clock::now();
+	    if (this->modelstatus==false){
+	       outputQueue.push(frame); // Pass the complete frame with the bounding box
+	       continue;
+	    }
             detectFaces(frame);
             auto end = std::chrono::high_resolution_clock::now();
     	    double yoloTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
