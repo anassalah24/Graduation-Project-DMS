@@ -23,7 +23,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(tcpSocket2, &QTcpSocket::disconnected, this, &ConnectionWidget::onSocket2Disconnected);
 
     connect(tcpSocket1, &QTcpSocket::errorOccurred, this, &ConnectionWidget::onConnectionError);
-    //connect(tcpSocket2, &QTcpSocket::errorOccurred, this, &ConnectionWidget::onConnectionError);
+    connect(tcpSocket2, &QTcpSocket::errorOccurred, this, &ConnectionWidget::onConnectionError);
 }
 
 ConnectionWidget::~ConnectionWidget() {
@@ -62,6 +62,20 @@ void ConnectionWidget::onConnectButtonClicked() {
         QMessageBox::warning(this, "Invalid Port", "Please enter a valid port number (1-65535). Example: 8080");
         return;
     }
+
+    // Disconnect existing connections if still connected
+    if (tcpSocket1->state() == QAbstractSocket::ConnectedState) {
+        tcpSocket1->disconnectFromHost();
+    }
+    if (tcpSocket2->state() == QAbstractSocket::ConnectedState) {
+        tcpSocket2->disconnectFromHost();
+    }
+
+    // Reset connection flags
+    socket1Connected = false;
+    socket2Connected = false;
+
+
     tcpSocket1->connectToHost(QHostAddress(ip), port);
     tcpSocket2->connectToHost(QHostAddress(ip), port + 1); // Use next port for second socket
 }
@@ -73,6 +87,9 @@ void ConnectionWidget::onDisconnectButtonClicked() {
     }
     if (QMessageBox::question(this, "Disconnect Confirmation", "Are you sure you want to disconnect?",
                               QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+
+
+
         tcpSocket1->disconnectFromHost();
         tcpSocket2->disconnectFromHost();
     }
