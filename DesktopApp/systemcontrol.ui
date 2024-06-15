@@ -27,13 +27,11 @@ background-color:#404E5C;
      <height>20</height>
     </rect>
    </property>
-
    <property name="styleSheet">
     <string notr="true">QLabel{
 color:white;
 }</string>
    </property>
-
    <property name="text">
     <string>Face Detection Models</string>
    </property>
@@ -57,7 +55,6 @@ color:white;
    </property>
   </widget>
   <widget class="QLabel" name="label_5">
-
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -125,7 +122,6 @@ background-color:#BFD7EA
    </property>
   </widget>
   <widget class="QLabel" name="label">
-
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -134,7 +130,6 @@ background-color:#BFD7EA
      <height>20</height>
     </rect>
    </property>
-
    <property name="styleSheet">
     <string notr="true">QLabel{
 color:white;
@@ -190,7 +185,6 @@ background-color:#BFD7EA
    </property>
    <property name="text">
     <string>OFF</string>
-
    </property>
   </widget>
   <widget class="QPushButton" name="onbutton">
@@ -217,7 +211,6 @@ background-color:#BFD7EA
     <string>ON</string>
    </property>
   </widget>
-
   <widget class="QComboBox" name="comboFaceDetection">
    <property name="geometry">
     <rect>
@@ -269,7 +262,6 @@ border: 2px solid white;
    </property>
   </widget>
   <widget class="QComboBox" name="comboEyeGaze">
-
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -364,7 +356,6 @@ border: 2px solid #BFD7EA;
     <string/>
    </property>
   </widget>
-
   <zorder>border_labe</zorder>
   <zorder>border_labe_2</zorder>
   <zorder>label_3</zorder>
@@ -379,7 +370,6 @@ border: 2px solid #BFD7EA;
   <zorder>comboFaceDetection</zorder>
   <zorder>comboHeadPose</zorder>
   <zorder>comboEyeGaze</zorder>
-
  </widget>
  <resources/>
  <connections/>
