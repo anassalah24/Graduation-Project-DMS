@@ -5,6 +5,8 @@
 #include "datahandler.h"
 #include <QMessageBox>
 #include "connectionwidget.h"
+#include "ui_systemcontrol.h"
+
 
 
 namespace Ui {
@@ -19,6 +21,9 @@ public:
     explicit SystemControl(DataHandler *dataHandler,ConnectionWidget *connectionWidget, QWidget *parent = nullptr);
     ~SystemControl();
     bool systemStatus=true;
+    QString getActiveFaceModel() const { return ui->comboFaceDetection->currentText(); }
+    QString getActiveHeadModel() const { return ui->comboHeadPose->currentText(); }
+    QString getActiveEyeModel() const { return ui->comboEyeGaze->currentText(); }
 
 
 private slots:

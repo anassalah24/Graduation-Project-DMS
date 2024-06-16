@@ -107,3 +107,5 @@ void SystemControl::onSystemOffClicked() {
     dataHandler->sendData(data);
     systemStatus = false;
 }
+
+

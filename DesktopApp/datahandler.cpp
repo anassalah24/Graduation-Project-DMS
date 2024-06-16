@@ -16,6 +16,8 @@ DataHandler::DataHandler(QTcpSocket *socket1, QTcpSocket *socket2, QObject *pare
     readingsCheckTimer = new QTimer(this);
     connect(readingsCheckTimer, &QTimer::timeout, this, &DataHandler::checkReadingsReception);
     readingsCheckTimer->start(1000); // Check every second
+    startFPSTimer();
+
 }
 
 DataHandler::~DataHandler() {
@@ -52,6 +54,7 @@ void DataHandler::onDataReady1() {
         emit faceReceived(QImage());
     } else {
         QImage faceImage = matToQImage(img);
+        frameCount++;  // Increment the frame count here after a successful frame reception
         emit faceReceived(faceImage);
     }
 }
@@ -146,3 +149,15 @@ void DataHandler::checkReadingsReception() {
     readingsReceivedSinceLastCheck = false; // Reset the flag
 }
 
+
+void DataHandler::startFPSTimer() {
+    fpsTimer = new QTimer(this);
+    connect(fpsTimer, &QTimer::timeout, this, &DataHandler::calculateFPS);
+    fpsTimer->start(1000);  // Trigger every second
+}
+
+void DataHandler::calculateFPS() {
+    lastFPS = frameCount;
+    frameCount = 0;  // Reset for the next interval
+    qDebug() << "Current FPS:" << lastFPS;
+}
