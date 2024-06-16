@@ -5,7 +5,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     connectionWidget(new ConnectionWidget(this)),
-    driverMonitoringWidget(new DriverMonitoringWidget(this)),
     systemcontrol(nullptr),
     readingsWidget(new ReadingsWidget)
 {
@@ -13,7 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Add the widgets to the main layout
     ui->conn_layout->addWidget(connectionWidget);
-    ui->dm_layout->addWidget(driverMonitoringWidget);
     ui->readings_layout->addWidget(readingsWidget);
 
     // Create the DataHandler and connect it to the sockets from the ConnectionWidget
@@ -27,6 +25,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create the ConfigsWidget and pass the DataHandler to it
     configsWidget = new ConfigsWidget(dataHandler,connectionWidget,systemcontrol, this);
     ui->cfgs_layout->addWidget(configsWidget);
+
+    driverMonitoringWidget= new DriverMonitoringWidget(dataHandler,connectionWidget,systemcontrol,this);
+    ui->dm_layout->addWidget(driverMonitoringWidget);
+
+
 
     // Connect the faceReceived signal to the updateFaceDisplay slot
     connect(dataHandler, &DataHandler::faceReceived, driverMonitoringWidget, &DriverMonitoringWidget::updateFaceDisplay);

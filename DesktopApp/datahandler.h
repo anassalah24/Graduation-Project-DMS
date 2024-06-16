@@ -18,6 +18,11 @@ public:
     ~DataHandler();  // Destructor declaration
 
     void sendData(const QByteArray &data);  // Method to send data
+    QTimer *fpsTimer;
+    int frameCount = 0;
+    int lastFPS = 0;
+
+    void startFPSTimer();
 
 signals:
     void faceReceived(QImage faceImage);
@@ -28,6 +33,8 @@ private slots:
     void onDataReady2();
     void checkFrameReception();
     void checkReadingsReception();
+    void calculateFPS();
+
 
 
 private:
