@@ -1,0 +1,9 @@
+Head Pose Engine Metrics:
+Max Time: 348 ms
+Min Time: 153 ms
+Average Time: 231.271 ms
+
+Eye Gaze Engine Metrics:
+Max Time: 152 ms
+Min Time: 73 ms
+Average Time: 106.069 ms

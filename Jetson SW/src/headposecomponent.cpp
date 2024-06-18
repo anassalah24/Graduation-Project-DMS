@@ -1,5 +1,14 @@
 #include "headposecomponent.h"
 #include "inferseq.h"
+#include <boost/filesystem.hpp> // For directory handling with Boost
+#include <boost/date_time/posix_time/posix_time.hpp> // For timestamps
+#include <boost/date_time/gregorian/gregorian.hpp>  // For to_iso_extended_string for dates
+#include <iomanip>  // For std::setw and std::setfill
+
+namespace fs = boost::filesystem;
+namespace pt = boost::posix_time;
+namespace gr = boost::gregorian;
+
 
 
 TRTEngineSingleton* TRTEngineSingleton::instance = nullptr;
@@ -72,57 +81,32 @@ void HeadPoseComponent::HeadPoseDetectionLoop() {
 
 std::vector<std::vector<float>> HeadPoseComponent::detectHeadPose(cv::Mat& croppedFace) {
     TRTEngineSingleton* trt = TRTEngineSingleton::getInstance();
-    auto start = std::chrono::high_resolution_clock::now();
-    std::vector<std::vector<float>> out = trt->infer(croppedFace);
-    auto end = std::chrono::high_resolution_clock::now();
-    double engineTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "AI Models combined time: " << engineTime << " ms" << std::endl;
+
+    // Measure headpose engine inference time
+    auto startHeadPose = std::chrono::high_resolution_clock::now();
+    auto headPoseResult = trt->inferHeadPose(croppedFace);
+    auto endHeadPose = std::chrono::high_resolution_clock::now();
+    double headPoseTime = std::chrono::duration_cast<std::chrono::milliseconds>(endHeadPose - startHeadPose).count();
+    headPoseTimes.push_back(headPoseTime);
+    maxHeadPoseTime = std::max(maxHeadPoseTime, headPoseTime);
+    minHeadPoseTime = std::min(minHeadPoseTime, headPoseTime);
+    totalHeadPoseTime += headPoseTime;
+    headPoseCount++;
+
+    // Measure eyegaze engine inference time
+    auto startEyeGaze = std::chrono::high_resolution_clock::now();
+    auto eyeGazeResult = trt->inferEyeGaze(croppedFace);
+    auto endEyeGaze = std::chrono::high_resolution_clock::now();
+    double eyeGazeTime = std::chrono::duration_cast<std::chrono::milliseconds>(endEyeGaze - startEyeGaze).count();
+    eyeGazeTimes.push_back(eyeGazeTime);
+    maxEyeGazeTime = std::max(maxEyeGazeTime, eyeGazeTime);
+    minEyeGazeTime = std::min(minEyeGazeTime, eyeGazeTime);
+    totalEyeGazeTime += eyeGazeTime;
+    eyeGazeCount++;
+
+    std::vector<std::vector<float>> out{headPoseResult, eyeGazeResult};
     return out;
 }
-
-
-
-
-
-
-
-    //std::string timeText = "time: " + std::to_string(int(engineTime))+"ms";
-    //cv::putText(frame, timeText, cv::Point(20, 20), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
-    //double fps = 1000/engineTime;
-    //std::string fpsText = "FPS: " + std::to_string(int(fps));
-    //cv::putText(frame, fpsText, cv::Point(20, 40), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
-    //int textPositionY = 55;  // Initial Y position for the first text
-
-    //for (float x : out) {
-	    //std::string text = std::to_string(x);  // Convert the float to string
-
-	    // Put the text on the image
-	    //cv::putText(frame, text, cv::Point(20, textPositionY), 
-		        //cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(255, 255, 255), 1);
-
-	    //textPositionY += 15;  // Move down for the next text
-	    //if (textPositionY > frame.rows - 15) {  // Check if the position is out of image bounds
-		//break;  // Reset position or break if you don't want to overwrite
-	    //}
-    //}
-
-
-    //for (float x : out){
-	//printf("%f \n",x);
-	//}
-
-    //for (const auto& row : out) {
-        // Loop through each element in the sub-vector
-        //for (const auto& elem : row) {
-          //  std::cout << elem << " ";
-        //}
-        //std::cout << std::endl;  // New line for each row
-   // }
-
-
-
-	
-   //outputQueue.push(out);
 
 
 
@@ -183,5 +167,46 @@ void HeadPoseComponent::updateEyeGazeEngine(const std::string& eyeGazeEnginePath
     trt->setEngine2(eyeGazeEnginePath);
     std::cout << "Eye gaze engine updated successfully." << std::endl;
 }
+
+
+void HeadPoseComponent::logPerformanceMetrics() {
+
+
+    // Ensure the directory exists
+    fs::path dir("benchmarklogs");
+    if (!fs::exists(dir)) {
+        fs::create_directory(dir);
+    }
+
+    // Get current time and format the filename
+    pt::ptime now = pt::second_clock::local_time();
+    std::ostringstream filename;
+    filename << dir.string() << "/benchmark_log_"
+             << gr::to_iso_extended_string(now.date()) << "_"  // Correctly use date to string conversion
+             << std::setw(2) << std::setfill('0') << now.time_of_day().hours() << "-"
+             << std::setw(2) << std::setfill('0') << now.time_of_day().minutes()
+             << ".txt";
+
+    // Open the log file in append mode
+    std::ofstream logFile(filename.str(), std::ios::app);
+
+    double averageHeadPoseTime = headPoseCount > 0 ? totalHeadPoseTime / headPoseCount : 0;
+    double averageEyeGazeTime = eyeGazeCount > 0 ? totalEyeGazeTime / eyeGazeCount : 0;
+
+    logFile << "Head Pose Engine Metrics:\n";
+    logFile << "Max Time: " << maxHeadPoseTime << " ms\n";
+    logFile << "Min Time: " << minHeadPoseTime << " ms\n";
+    logFile << "Average Time: " << averageHeadPoseTime << " ms\n\n";
+
+    logFile << "Eye Gaze Engine Metrics:\n";
+    logFile << "Max Time: " << maxEyeGazeTime << " ms\n";
+    logFile << "Min Time: " << minEyeGazeTime << " ms\n";
+    logFile << "Average Time: " << averageEyeGazeTime << " ms\n";
+
+    logFile.close();
+}
+
+
+
 
 
