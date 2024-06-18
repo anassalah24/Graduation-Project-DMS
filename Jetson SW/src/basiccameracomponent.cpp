@@ -45,10 +45,10 @@ void BasicCameraComponent::stopCapture() {
 
         captureThread.join();
     }
-    if (cap.isOpened()) {
+//    if (cap.isOpened()) {
 
-        cap.release();
-    }
+ //       cap.release();
+//    }
 }
 
 

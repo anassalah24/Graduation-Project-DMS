@@ -15,6 +15,7 @@ TRTEngineSingleton* TRTEngineSingleton::instance = nullptr;
 
 
 
+
 //constructor
 HeadPoseComponent::HeadPoseComponent(ThreadSafeQueue<cv::Mat>& inputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue, ThreadSafeQueue<std::vector<std::vector<float>>>& outputQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
 : inputQueue(inputQueue), faceRectQueue(faceRectQueue), outputQueue(outputQueue),framesQueue(framesQueue) ,commandsQueue(commandsQueue),faultsQueue(faultsQueue), running(false) {}
@@ -161,6 +162,8 @@ void HeadPoseComponent::updateHeadPoseEngine(const std::string& headPoseEnginePa
     TRTEngineSingleton* trt = TRTEngineSingleton::getInstance();
     trt->setEngine1(headPoseEnginePath);
     std::cout << "Head pose engine updated successfully." << std::endl;
+    std::string command = "Clear Queue";
+    commandsQueue.push(command);
 }
 
 // Update the engine for eye gaze detection
@@ -168,6 +171,8 @@ void HeadPoseComponent::updateEyeGazeEngine(const std::string& eyeGazeEnginePath
     TRTEngineSingleton* trt = TRTEngineSingleton::getInstance();
     trt->setEngine2(eyeGazeEnginePath);
     std::cout << "Eye gaze engine updated successfully." << std::endl;
+    std::string command = "Clear Queue";
+    commandsQueue.push(command);
 }
 
 

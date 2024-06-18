@@ -33,51 +33,49 @@ bool DMSManager::startSystem() {
     running = true;
 
 	if (firstRun){
-    //starting each component in its own thread
-    cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
-    //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
-    faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
-    //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
-    headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
-    //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
-
-    tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
-
-    //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
-    //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
-    commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
-    //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
-	firstRun = false ;    
-	return true;
+	    //starting each component in its own thread
+	    cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
+	    //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
+	    faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
+	    //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
+	    headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
+	    //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
+	    tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
+	    //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
+	    //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
+	    commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
+	    //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
+	    firstRun = false ;    
+            return true;
 	}
 	else{
-	//starting each component in its own thread
-	cameraComponent.initialize("/dev/video0");
-    cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
-    //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
-	faceDetectionComponent.initialize("/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.weights");
-    faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
-    //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
-    headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
-    //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
-    //tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
-    //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
-    //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
-    //commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
-    //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
-    //----------------------------------------
-    cameraComponent.startCapture();
-    //preprocessingComponent.startProcessing();
-    faceDetectionComponent.startDetection();
-    //drowsinessComponent.startDrowsinessDetection();
-    headposeComponent.startHeadPoseDetection();
-    //eyegazeComponent.startEyeGazeDetection();
-    //tcpComponent.startServer();
-    //vehicleStateManager.startStateManager();
-    //postProcessingComponent.postProcess();
-    //faultManager.faultstart();
-	firstRun = false ;
-	return true;
+	    //starting each component in its own thread
+	    cameraComponent.initialize("/dev/video0");
+	    cameraThread = std::thread(&DMSManager::cameraLoop, this);  // Start the camera loop in its own thread
+	    //preprocessingThread = std::thread(&DMSManager::preprocessingLoop, this);  // Start the preprocessing loop in its own thread
+	    //faceDetectionComponent.initialize("/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/ modelconfigs/yoloface-500k-v2.weights");
+	    faceDetectionThread = std::thread(&DMSManager::faceDetectionLoop, this);  // Start face detection in its own thread
+	    //drowsinessThread = std::thread(&DMSManager::drowsinessLoop, this);  // Start drowsiness detection in its own thread
+	    headposeThread = std::thread(&DMSManager::headposeLoop, this);  // Start headpose detection in its own thread
+	    //eyegazeThread = std::thread(&DMSManager::eyegazeLoop, this);  // Start eyegaze detection in its own thread
+	    //tcpThread = std::thread(&DMSManager::commtcpLoop, this); // Start tcp thread in its own thread
+	    //vehicleStateThread = std::thread(&DMSManager::vehicleStateLoop, this); // Start vehicle state in its own thread
+	    //postProcessingThread = std::thread(&DMSManager::postprocessingLoop, this); // Start post processing in its own thread
+	    //commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
+	    //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
+	    //----------------------------------------
+	    cameraComponent.startCapture();
+	    //preprocessingComponent.startProcessing();
+	    faceDetectionComponent.startDetection();
+	    //drowsinessComponent.startDrowsinessDetection();
+	    headposeComponent.startHeadPoseDetection();
+	    //eyegazeComponent.startEyeGazeDetection();
+	    //tcpComponent.startServer();
+	    //vehicleStateManager.startStateManager();
+	    //postProcessingComponent.postProcess();
+	    //faultManager.faultstart();
+		firstRun = false ;
+		return true;
 	}
 }
 
@@ -214,6 +212,7 @@ void DMSManager::clearQueues(){
 
 
 void DMSManager::handlecommand(std::string& command) {
+	clearQueues();
 	// Example model paths
 	std::map<std::string, std::string> headPoseModels = {
 		{"AX", "/home/dms/DMS/ModularCode/include/Ax.engine"},
@@ -258,6 +257,7 @@ void DMSManager::handlecommand(std::string& command) {
 
     //setting face detection threshold
     else if (command.find("SET_FDT:") != std::string::npos) {
+
         size_t pos = command.find(":");
         if (pos != std::string::npos) {
             std::string fdtValueStr = command.substr(pos + 1);
@@ -299,7 +299,9 @@ void DMSManager::handlecommand(std::string& command) {
     } else if (command == "TURN_ON") {
         std::cout << "Turning on..." << std::endl;
 	startSystem();
-
+    //Clear Queue
+    } else if (command == "Clear Queue") {
+        clearQueues();
     // Handling Face Detection Model
     }else if (command.find("SET_FD_MODEL:") != std::string::npos) {
         size_t pos = command.find(":");
@@ -317,7 +319,7 @@ void DMSManager::handlecommand(std::string& command) {
 				} 
 				else{
 					faceDetectionComponent.stopDetection();
-		            faceDetectionComponent.initialize(configPath,weightPath);
+		            		faceDetectionComponent.initialize(configPath,weightPath);
 					faceDetectionComponent.modelstatus = true;
 					faceDetectionComponent.startDetection();
 		            std::cout << "Updated Face Detection Model and Config to: " << weightPath << " and " << configPath << std::endl;
@@ -337,6 +339,7 @@ void DMSManager::handlecommand(std::string& command) {
 			std::string modelValue = command.substr(pos + 1);
 			std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
 			if (headPoseModels.find(modelValue) != headPoseModels.end()) {
+				clearQueues();
 			    headposeComponent.updateHeadPoseEngine(headPoseModels[modelValue]);
 				clearQueues();
 			} else {
@@ -353,6 +356,7 @@ void DMSManager::handlecommand(std::string& command) {
 			std::string modelValue = command.substr(pos + 1);
 			std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
 			if (eyeGazeModels.find(modelValue) != eyeGazeModels.end()) {
+				clearQueues();
 			    headposeComponent.updateEyeGazeEngine(eyeGazeModels[modelValue]);
 				clearQueues();
 			} else {
@@ -377,7 +381,8 @@ bool DMSManager::initializeCamera(const std::string& source) {
     return cameraComponent.initialize(source);
 }
 bool DMSManager::initializeFaceDetection(const std::string& modelConfiguration, const std::string& modelWeights) {
-    return faceDetectionComponent.initialize(modelConfiguration, modelWeights);
+    //return faceDetectionComponent.initialize(modelConfiguration, modelWeights);
+    return true;
 }
 
 //*******if needed for drowsiness detection
