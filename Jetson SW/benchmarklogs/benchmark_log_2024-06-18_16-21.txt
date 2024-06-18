@@ -1,0 +1,11 @@
+Head Pose Engine Metrics:
+Max Time: 529 ms
+Min Time: 177 ms
+Average Time: 274.457 ms
+
+Eye Gaze Engine Metrics:
+Max Time: 458 ms
+Min Time: 76 ms
+Average Time: 125.618 ms
+Peak GPU Memory Usage for Head Pose: 18446744073709543424 bytes
+Peak GPU Memory Usage for Eye Gaze: 18446744073709469696 bytes
