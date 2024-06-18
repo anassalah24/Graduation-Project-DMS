@@ -45,7 +45,7 @@ public:
         }
     }
 
-	void setEngine1(const std::string& enginePath) {
+   void setEngine1(const std::string& enginePath) {
 		std::lock_guard<std::mutex> lock(mtx);
 		if (enginePath == "No Head Pose") {
 			std::cout << "Skipping load of head pose engine." << std::endl;
@@ -69,7 +69,7 @@ public:
 		}
 	}
 
-	void setEngine2(const std::string& enginePath) {
+   void setEngine2(const std::string& enginePath) {
 		std::lock_guard<std::mutex> lock(mtx);
 		if (enginePath == "No Eye Gaze") {
 			std::cout << "Skipping load of eye gaze engine." << std::endl;
@@ -93,87 +93,107 @@ public:
 		}
 	}
 
-    std::vector<std::vector<float>> infer(const cv::Mat& frame) {
-
-		std::lock_guard<std::mutex> lock(mtx); // Protect inference process
-		std::vector<float> defaultOutput(9, -100); // Default output when engine is skipped
-		std::vector<std::vector<float>> results(2, defaultOutput); // Create execution contexts
-		// Create execution contexts
-		IExecutionContext* context1 = engine1 ? engine1->createExecutionContext() : nullptr;
-		IExecutionContext* context2 = engine2 ? engine2->createExecutionContext() : nullptr;
-
-        // Read and preprocess image using OpenCV
-        cv::Mat image = frame;
-        if (image.empty()) {
-            std::cerr << "Failed to read image" << std::endl;
-            return {{-1}, {-1}};
-        }
-
-        // Resize and preprocess image
-        cv::Mat resizedImage;
-        cv::resize(image, resizedImage, cv::Size(224, 224)); // Resize to input size (224x224)
-        resizedImage.convertTo(resizedImage, CV_32F);
-        cv::cvtColor(resizedImage, resizedImage, cv::COLOR_BGR2RGB); // OpenCV uses BGR by default, convert to RGB
-
-        // Mean and standard deviation values
-        std::vector<float> mean = {0.485, 0.456, 0.406};
-        std::vector<float> std = {0.229, 0.224, 0.225};
-
-        // Normalize image
-        for (int c = 0; c < 3; ++c) {
-            resizedImage.forEach<cv::Vec3f>([&mean, &std, c](cv::Vec3f &pixel, const int* position) -> void {
-                pixel[c] = (pixel[c] / 255.0 - mean[c]) / std[c];
-            });
-        }
-
-        // Allocate GPU buffers
-        int batchSize = 1;
-        int inputSize = 1 * 3 * 224 * 224; // Input size for the model
-        int outputSize1 = 9; // Output size for the first model
-        int outputSize2 = 9; // Output size for the second model (assuming same output size)
-
-        void* gpuInputBuffer;
-        void* gpuOutputBuffer1;
-        void* gpuOutputBuffer2;
-        cudaMalloc(&gpuInputBuffer, batchSize * inputSize * sizeof(float));
-        cudaMalloc(&gpuOutputBuffer1, batchSize * outputSize1 * sizeof(float));
-        cudaMalloc(&gpuOutputBuffer2, batchSize * outputSize2 * sizeof(float));
-
-        // Copy preprocessed image data to GPU
-        cudaMemcpy(gpuInputBuffer, resizedImage.ptr<float>(), inputSize * sizeof(float), cudaMemcpyHostToDevice);
-
-		// Inference for the first model
-		if (context1) {
-		    void* buffers1[] = {gpuInputBuffer, gpuOutputBuffer1};
-		    context1->executeV2(buffers1);
-
-		    // Copy output data from GPU
-		    cudaMemcpy(results[0].data(), gpuOutputBuffer1, outputSize1 * sizeof(float), cudaMemcpyDeviceToHost);
-		} else {
-		    std::cerr << "Head pose engine not loaded, using default values." << std::endl;
-		}
-
-		// Inference for the second model
-		if (context2) {
-		    void* buffers2[] = {gpuInputBuffer, gpuOutputBuffer2};
-		    context2->executeV2(buffers2);
-
-		    // Copy output data from GPU
-		    cudaMemcpy(results[1].data(), gpuOutputBuffer2, outputSize2 * sizeof(float), cudaMemcpyDeviceToHost);
-		} else {
-		    std::cerr << "Eye gaze engine not loaded, using default values." << std::endl;
-		}
-
-        cudaFree(gpuInputBuffer);
-        cudaFree(gpuOutputBuffer1);
-        cudaFree(gpuOutputBuffer2);
-    	if (context1) context1->destroy();
-    	if (context2) context2->destroy();
-
-        return results;
-
-        // No need to destroy the engines here since they're managed by the singleton
+  std::vector<float> inferHeadPose(const cv::Mat& croppedFace) {
+    std::lock_guard<std::mutex> lock(mtx);
+    if (!engine1) {
+        std::cerr << "Head pose engine not loaded, using default values." << std::endl;
+        return std::vector<float>(9, -100);
     }
+
+    // Preprocessing
+    cv::Mat resizedImage;
+    cv::resize(croppedFace, resizedImage, cv::Size(224, 224));  // Assume input size is 224x224
+    resizedImage.convertTo(resizedImage, CV_32F);
+    cv::cvtColor(resizedImage, resizedImage, cv::COLOR_BGR2RGB);
+
+    std::vector<float> mean = {0.485, 0.456, 0.406};
+    std::vector<float> std = {0.229, 0.224, 0.225};
+    for (int c = 0; c < 3; ++c) {
+        resizedImage.forEach<cv::Vec3f>([&mean, &std, c](cv::Vec3f &pixel, const int* position) -> void {
+            pixel[c] = (pixel[c] / 255.0 - mean[c]) / std[c];
+        });
+    }
+
+    // Allocate GPU buffers
+    int batchSize = 1;
+    int inputSize = 1 * 3 * 224 * 224;
+    int outputSize = 9;  // Output size for head pose model
+    void* gpuInputBuffer;
+    void* gpuOutputBuffer;
+    cudaMalloc(&gpuInputBuffer, batchSize * inputSize * sizeof(float));
+    cudaMalloc(&gpuOutputBuffer, batchSize * outputSize * sizeof(float));
+
+    // Copy data to GPU
+    cudaMemcpy(gpuInputBuffer, resizedImage.ptr<float>(), inputSize * sizeof(float), cudaMemcpyHostToDevice);
+
+    // Execute model
+    IExecutionContext* context = engine1->createExecutionContext();
+    void* buffers[] = {gpuInputBuffer, gpuOutputBuffer};
+    context->executeV2(buffers);
+
+    // Retrieve results
+    std::vector<float> results(outputSize);
+    cudaMemcpy(results.data(), gpuOutputBuffer, outputSize * sizeof(float), cudaMemcpyDeviceToHost);
+
+    // Cleanup
+    cudaFree(gpuInputBuffer);
+    cudaFree(gpuOutputBuffer);
+    context->destroy();
+
+    return results;
+}
+
+  std::vector<float> inferEyeGaze(const cv::Mat& croppedFace) {
+    std::lock_guard<std::mutex> lock(mtx);
+    if (!engine2) {
+        std::cerr << "Eye gaze engine not loaded, using default values." << std::endl;
+        return std::vector<float>(9, -100);
+    }
+
+    // Preprocessing
+    cv::Mat resizedImage;
+    cv::resize(croppedFace, resizedImage, cv::Size(224, 224));
+    resizedImage.convertTo(resizedImage, CV_32F);
+    cv::cvtColor(resizedImage, resizedImage, cv::COLOR_BGR2RGB);
+
+    std::vector<float> meanValues = {0.485, 0.456, 0.406};
+    std::vector<float> stdDevs = {0.229, 0.224, 0.225};
+    for (int c = 0; c < 3; ++c) {
+        resizedImage.forEach<cv::Vec3f>([&meanValues, &stdDevs, c](cv::Vec3f &pixel, const int* position) -> void {
+            pixel[c] = (pixel[c] / 255.0 - meanValues[c]) / stdDevs[c];
+        });
+    }
+
+    // Allocate GPU buffers
+    int batchSize = 1;
+    int inputSize = 1 * 3 * 224 * 224;
+    int outputSize = 9;  // Assuming the output size for the eye gaze model
+    void* gpuInputBuffer;
+    void* gpuOutputBuffer;
+    cudaMalloc(&gpuInputBuffer, batchSize * inputSize * sizeof(float));
+    cudaMalloc(&gpuOutputBuffer, batchSize * outputSize * sizeof(float));
+
+    // Copy data to GPU
+    cudaMemcpy(gpuInputBuffer, resizedImage.ptr<float>(), inputSize * sizeof(float), cudaMemcpyHostToDevice);
+
+    // Execute model
+    IExecutionContext* context = engine2->createExecutionContext();
+    void* buffers[] = {gpuInputBuffer, gpuOutputBuffer};
+    context->executeV2(buffers);
+
+    // Retrieve results
+    std::vector<float> results(outputSize);
+    cudaMemcpy(results.data(), gpuOutputBuffer, outputSize * sizeof(float), cudaMemcpyDeviceToHost);
+
+    // Cleanup
+    cudaFree(gpuInputBuffer);
+    cudaFree(gpuOutputBuffer);
+    context->destroy();
+
+    return results;
+}
+
+
 
 
     ~TRTEngineSingleton() {

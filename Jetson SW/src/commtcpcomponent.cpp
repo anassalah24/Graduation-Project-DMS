@@ -127,6 +127,7 @@ void CommTCPComponent::handleFrameClient(int clientSocket) {
     }
 }
 
+
 // Handle command reception and readings data transmission to a client
 void CommTCPComponent::handleCommandClient(int clientSocket) {
     try{

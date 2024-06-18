@@ -66,7 +66,7 @@ bool DMSManager::startSystem() {
     //commandsThread = std::thread(&DMSManager::commandsLoop, this); // Start commands thread in its own thread
     //faultsThread = std::thread(&DMSManager::faultsLoop, this); // Start faults thread in its own thread
     //----------------------------------------
-	cameraComponent.startCapture();
+    cameraComponent.startCapture();
     //preprocessingComponent.startProcessing();
     faceDetectionComponent.startDetection();
     //drowsinessComponent.startDrowsinessDetection();
@@ -88,6 +88,8 @@ void DMSManager::stopSystem() {
     running = false;  // Signal all loops to stop
      
     clearQueues();
+    // Log performance metrics
+    headposeComponent.logPerformanceMetrics();
 
     cameraComponent.stopCapture();
     preprocessingComponent.stopProcessing();

@@ -5,9 +5,19 @@
 #include "threadsafequeue.h"
 #include <thread>
 #include <chrono>
+#include <numeric> // For std::accumulate
+#include <vector>
+
+
 
 
 class HeadPoseComponent {
+    // Separate timing and statistics for each engine
+    std::vector<double> headPoseTimes, eyeGazeTimes;
+    double maxHeadPoseTime = 0.0, maxEyeGazeTime = 0.0;
+    double minHeadPoseTime = std::numeric_limits<double>::max(), minEyeGazeTime = std::numeric_limits<double>::max();
+    double totalHeadPoseTime = 0.0, totalEyeGazeTime = 0.0;
+    size_t headPoseCount = 0, eyeGazeCount = 0;
 public:
     HeadPoseComponent(ThreadSafeQueue<cv::Mat>& inputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue, ThreadSafeQueue<std::vector<std::vector<float>>>& outputQueue,ThreadSafeQueue<cv::Mat>& framesQueue, ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue);
     ~HeadPoseComponent();
@@ -17,6 +27,7 @@ public:
     void stopHeadPoseDetection();
     void updateHeadPoseEngine(const std::string& headPoseEnginePath);
     void updateEyeGazeEngine(const std::string& eyeGazeEnginePath);
+    void logPerformanceMetrics();
 
 
 

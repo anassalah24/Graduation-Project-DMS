@@ -25,7 +25,7 @@ CXXFLAGS := -std=c++11 -I$(INCLUDE_DIR) -isystem $(BENCHMARK_DIR)/include -I/usr
 
 # Linker flags
 #LDFLAGS := `pkg-config --libs opencv4` -lpthread
-LDFLAGS := `pkg-config --libs opencv4` -L$(BENCHMARK_DIR)/build/src -lbenchmark -lpthread -L/usr/lib/aarch64-linux-gnu/ -L/usr/local/cuda/lib64 -lcudart -lnvinfer
+LDFLAGS := `pkg-config --libs opencv4` -L$(BENCHMARK_DIR)/build/src -lbenchmark -lpthread -L/usr/lib/aarch64-linux-gnu/ -L/usr/local/cuda/lib64 -lcudart -lnvinfer -lboost_system -lboost_filesystem -lboost_date_time
 
 
 # OpenCV library path
