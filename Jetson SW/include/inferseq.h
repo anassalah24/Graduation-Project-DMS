@@ -40,7 +40,7 @@ private:
     ICudaEngine* engine2; // Eye gaze engine
 
     TRTEngineSingleton() : engine1(nullptr), engine2(nullptr) {
-        loadEngines(); // Initial engine loading
+        //loadEngines(); // Initial engine loading
     }
 
     size_t peakHeadPoseGpuMemoryUsage = 0;

@@ -14,7 +14,7 @@ public:
     void startDetection();
     void stopDetection();
     void setFDT(int fdt);
-    bool modelstatus = true;
+    bool modelstatus = false;
 
 
 private:

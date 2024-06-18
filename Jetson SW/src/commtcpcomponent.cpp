@@ -63,6 +63,8 @@ void CommTCPComponent::frameServerLoop() {
         newSocket = accept(serverFd, NULL, NULL);
         if (newSocket > 0) {
             std::cout << "Client connected to frame server: socket FD " << newSocket << std::endl;
+	    std::string command = "Clear Queue";
+            commandsQueue.push(command);
             std::thread(&CommTCPComponent::handleFrameClient, this, newSocket).detach();
         } else {
             //std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -92,6 +94,8 @@ void CommTCPComponent::commandServerLoop() {
         newSocket = accept(serverFd, NULL, NULL);
         if (newSocket > 0) {
             std::cout << "Client connected to command server: socket FD " << newSocket << std::endl;
+	    std::string command = "Clear Queue";
+            commandsQueue.push(command);
             std::thread(&CommTCPComponent::handleCommandClient, this, newSocket).detach();
         } else {
             //std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -210,6 +214,8 @@ void CommTCPComponent::handleCommandClient(int clientSocket) {
 		                commandsQueue.push(command);
 
 		            } else if (message.find("SET_FD_MODEL") != std::string::npos) {
+			        std::string command = "Clear Queue";
+			        commandsQueue.push(command);
 		                std::cout << "Received SET_FD_MODEL command with value: " << message.substr(13) << std::endl;
 		                commandsQueue.push("SET_FD_MODEL:" + message.substr(13));
 
@@ -218,6 +224,8 @@ void CommTCPComponent::handleCommandClient(int clientSocket) {
 		                commandsQueue.push("SET_HP_MODEL:" + message.substr(13));
 
 		            } else if (message.find("SET_EG_MODEL") != std::string::npos) {
+			        std::string command = "Clear Queue";
+			        commandsQueue.push(command);
 		                std::cout << "Received SET_EG_MODEL command with value: " << message.substr(13) << std::endl;
 		                commandsQueue.push("SET_EG_MODEL:" + message.substr(13));
 

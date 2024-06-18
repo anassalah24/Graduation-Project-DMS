@@ -37,10 +37,10 @@ int main() {
     }
 
     // Initialize the face detection component with weights and configurations
-    if (!dmsManager.initializeFaceDetection("/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.weights")) {
-        std::cerr << "Failed to initialize face detection component." << std::endl;
-        return -1;
-    }
+//    if (!dmsManager.initializeFaceDetection("/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.weights")) {
+//        std::cerr << "Failed to initialize face detection component." << std::endl;
+//        return -1;
+//    }
 
 
     //****************** Initialize the drowsiness detection component with anything needed
@@ -50,10 +50,10 @@ int main() {
     //}
 
     //****************** Initialize the head pose detection component with anything needed
-    if (!dmsManager.initializeHeadposeDetection()) {
-        std::cerr << "Failed to initialize headpose detection component." << std::endl;
-        return -1;
-    }
+//    if (!dmsManager.initializeHeadposeDetection()) {
+//        std::cerr << "Failed to initialize headpose detection component." << std::endl;
+ //       return -1;
+ //   }
 
     //******************missing initialization for the vehicle state to pass the file to read from***************************
     //-----------------------------------------------------------------------------------------------------------------------------

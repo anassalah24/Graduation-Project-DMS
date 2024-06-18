@@ -20,8 +20,11 @@ bool FaceDetectionComponent::initialize(const std::string& modelConfiguration, c
         std::cerr << "Failed to load the model or config file." << std::endl;
         return false;
     }
+    std::string command = "Clear Queue";
+    commandsQueue.push(command);
     return true;
 }
+
 
 // start detection loop in another thread
 void FaceDetectionComponent::startDetection() {
@@ -30,6 +33,8 @@ void FaceDetectionComponent::startDetection() {
         return;
     }
     running = true;
+    std::string command = "Clear Queue";
+    commandsQueue.push(command);
     detectionThread = std::thread(&FaceDetectionComponent::detectionLoop, this);
 }
 
@@ -46,7 +51,8 @@ void FaceDetectionComponent::stopDetection() {
 void FaceDetectionComponent::detectionLoop() {
     cv::Mat frame;
     this->lastTime = std::chrono::high_resolution_clock::now(); // Initialize the last time
-
+    std::string command = "Clear Queue";
+    commandsQueue.push(command);
     while (running) {
         if (inputQueue.tryPop(frame)) {
             auto start = std::chrono::high_resolution_clock::now();
