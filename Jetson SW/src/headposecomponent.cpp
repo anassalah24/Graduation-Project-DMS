@@ -79,6 +79,8 @@ void HeadPoseComponent::HeadPoseDetectionLoop() {
     }
 }
 
+
+
 std::vector<std::vector<float>> HeadPoseComponent::detectHeadPose(cv::Mat& croppedFace) {
     TRTEngineSingleton* trt = TRTEngineSingleton::getInstance();
 
@@ -201,7 +203,26 @@ void HeadPoseComponent::logPerformanceMetrics() {
     logFile << "Eye Gaze Engine Metrics:\n";
     logFile << "Max Time: " << maxEyeGazeTime << " ms\n";
     logFile << "Min Time: " << minEyeGazeTime << " ms\n";
-    logFile << "Average Time: " << averageEyeGazeTime << " ms\n";
+    logFile << "Average Time: " << averageEyeGazeTime << " ms\n\n";
+
+    TRTEngineSingleton* engine = TRTEngineSingleton::getInstance();
+    logFile << "Peak GPU Memory Usage for Head Pose: "
+            << static_cast<double>(engine->getPeakHeadPoseGpuMemoryUsage()) / (1024 * 1024) << " MB\n";
+    logFile << "Peak GPU Memory Usage for Eye Gaze: "
+            << static_cast<double>(engine->getPeakEyeGazeGpuMemoryUsage()) / (1024 * 1024) << " MB\n";
+
+    logFile << "Average CPU Memory Usage for Head Pose: "
+            << static_cast<double>(engine->gettotalCpuMemoryUsageHeadPose()) / engine->getheadPoseInferenceCount() / (1024 * 1024) << " MB\n";
+    logFile << "Average CPU Memory Usage for Eye Gaze: "
+            << static_cast<double>(engine->gettotalCpuMemoryUsageEyeGaze()) / engine->geteyeGazeInferenceCount() / (1024 * 1024) << " MB\n";
+
+    logFile << "Average CPU Usage for Head Pose: "
+            << static_cast<double>(engine->getheadPoseCpuUsage()) / engine->getheadPoseInferenceCount() << " %\n";
+
+    logFile << "Average CPU Usage for Eye Gaze: "
+            << static_cast<double>(engine->geteyeGazeCpuUsage()) / engine->geteyeGazeInferenceCount() << " %\n";
+
+    engine->resetPeakGpuMemoryUsage();
 
     logFile.close();
 }
