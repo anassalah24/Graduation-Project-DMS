@@ -10,6 +10,14 @@
 #include <thread>
 #include <cstdint>
 #include <cstring>  // for memcpy
+#include <boost/filesystem.hpp> // For directory handling with Boost
+#include <boost/date_time/posix_time/posix_time.hpp> // For timestamps
+#include <boost/date_time/gregorian/gregorian.hpp>  // For to_iso_extended_string for dates
+#include <iomanip>  // For std::setw and std::setfill
+
+namespace fs = boost::filesystem;
+namespace pt = boost::posix_time;
+namespace gr = boost::gregorian;
 
 
 // Constructor
@@ -115,13 +123,21 @@ void CommTCPComponent::handleFrameClient(int clientSocket) {
                 
                 ssize_t bytesSent = send(clientSocket, &bufferSize, sizeof(bufferSize), 0);
                 if (bytesSent == -1 || bytesSent == 0) {
+                    transmissionErrors++;
                     throw std::runtime_error("Failed to send frame size");
                 }
-                
+
+                totalFrameDataSent += bytesSent;
+                frameCount++;  // Increment the frame count
+
+
                 bytesSent = send(clientSocket, buffer.data(), buffer.size(), 0);
                 if (bytesSent == -1 || bytesSent == 0) {
+                    transmissionErrors++;
                     throw std::runtime_error("Failed to send frame data");
                 }
+                totalFrameDataSent += bytesSent;
+
             }
         }
         close(clientSocket);
@@ -143,10 +159,14 @@ void CommTCPComponent::handleCommandClient(int clientSocket) {
 		        std::vector<uint8_t> serializedData = serialize(reading);
 		        ssize_t bytesSent = send(clientSocket, serializedData.data(), serializedData.size(), 0);
 		        if (bytesSent == -1 || bytesSent == 0) {
+                    	    transmissionErrors++;
 		            std::cerr << "Failed to send reading data. Error: " << strerror(errno) << std::endl;
 		            close(clientSocket);
 		            return; // Exit the thread
 		        }
+
+                	totalReadingsDataSent += bytesSent;
+
 		        //send(clientSocket, serializedData.data(), serializedData.size(), 0);
 		    }
 
@@ -157,6 +177,7 @@ void CommTCPComponent::handleCommandClient(int clientSocket) {
 		    
 		    if (bytesRead == -1 || bytesRead == 0) {
 		        if (errno != EWOULDBLOCK) {
+                            transmissionErrors++;
 		            std::cerr << "Failed to receive data. Error: " << strerror(errno) << std::endl;
 		            close(clientSocket);
 		            return; // Exit the thread
@@ -165,6 +186,8 @@ void CommTCPComponent::handleCommandClient(int clientSocket) {
 		    }else if (bytesRead > 0) {
 		        const char* ptr = buffer;
 		        const char* end = buffer + bytesRead;
+
+                	totalCommandDataSent += bytesRead;
 
 		        while (ptr < end) {
 		            // Read the length of the next message
@@ -267,3 +290,49 @@ std::vector<uint8_t> CommTCPComponent::serialize(const std::vector<std::vector<f
     return buffer;
 }
 
+
+
+
+void CommTCPComponent::logDataTransferMetrics() {
+
+    // Ensure the directory exists
+    fs::path dir("benchmarklogs");
+    if (!fs::exists(dir)) {
+        fs::create_directory(dir);
+    }
+
+    // Get current time and format the filename
+    pt::ptime now = pt::second_clock::local_time();
+    std::ostringstream filename;
+    filename << dir.string() << "/benchmark_log_"
+             << gr::to_iso_extended_string(now.date()) << "_"  // Correctly use date to string conversion
+             << std::setw(2) << std::setfill('0') << now.time_of_day().hours() << "-"
+             << std::setw(2) << std::setfill('0') << now.time_of_day().minutes()
+             << ".txt";
+
+    // Open the log file in append mode
+    std::ofstream logFile(filename.str(), std::ios::app);
+
+
+    size_t totalFrameData = getTotalFrameDataSent();
+    size_t totalCommandData = getTotalCommandDataSent();
+    size_t totalReadingsData = getTotalReadingsDataSent();
+    size_t frameCount = getFrameCount();
+    size_t transmissionErrors = getTransmissionErrors();
+
+
+    double averageFrameSize = frameCount > 0 ? static_cast<double>(totalFrameData) / frameCount : 0;
+
+    logFile << "TCP Data Transfer Metrics:\n";
+    logFile << "Total Frame Data Sent: " << totalFrameData / (1024 * 1024) << " MB\n";
+    logFile << "Average Frame Size Sent: " << averageFrameSize / 1024 << " KB\n";  // Log the average frame size
+    logFile << "Total Command Data Recieved: " << totalCommandData / (1024) << " KB\n";
+    logFile << "Total Readings Data Sent: " << totalReadingsData / (1024) << " KB\n";
+    logFile << "Transmission Errors: " << transmissionErrors << "\n";
+    logFile << "<<------------------------------------------------------------------->>\n";
+
+
+    resetDataTransferMetrics();
+
+    logFile.close();
+}

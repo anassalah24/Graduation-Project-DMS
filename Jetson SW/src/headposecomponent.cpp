@@ -199,7 +199,7 @@ void HeadPoseComponent::logPerformanceMetrics() {
 
     double averageHeadPoseTime = headPoseCount > 0 ? totalHeadPoseTime / headPoseCount : 0;
     double averageEyeGazeTime = eyeGazeCount > 0 ? totalEyeGazeTime / eyeGazeCount : 0;
-
+    logFile << "<<------------------------------------------------------------------->>\n";
     logFile << "Head Pose Engine Metrics:\n";
     logFile << "Max Time: " << maxHeadPoseTime << " ms\n";
     logFile << "Min Time: " << minHeadPoseTime << " ms\n";
@@ -226,6 +226,7 @@ void HeadPoseComponent::logPerformanceMetrics() {
 
     logFile << "Average CPU Usage for Eye Gaze: "
             << static_cast<double>(engine->geteyeGazeCpuUsage()) / engine->geteyeGazeInferenceCount() << " %\n";
+    logFile << "<<------------------------------------------------------------------->>\n";
 
     engine->resetPeakGpuMemoryUsage();
 
