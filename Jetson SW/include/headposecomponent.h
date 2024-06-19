@@ -29,7 +29,17 @@ public:
     void updateEyeGazeEngine(const std::string& eyeGazeEnginePath);
     void logPerformanceMetrics();
 
+    void resetPerformanceMetrics(){
+	totalHeadPoseTime=0.0;
+	totalEyeGazeTime= 0.0;
+	headPoseCount =0;
+	eyeGazeCount=0;
+	minHeadPoseTime = std::numeric_limits<double>::max();
+	minEyeGazeTime = std::numeric_limits<double>::max();
+	maxHeadPoseTime = 0.0;
+	maxEyeGazeTime = 0.0;
 
+    }
 
 private:
     ThreadSafeQueue<cv::Mat>& inputQueue;

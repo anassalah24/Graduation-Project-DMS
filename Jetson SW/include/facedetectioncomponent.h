@@ -15,6 +15,21 @@ public:
     void stopDetection();
     void setFDT(int fdt);
     bool modelstatus = false;
+    void logPerformanceMetrics();
+
+    double totalDetectionTime = 0;
+    double maxDetectionTime = 0;
+    double minDetectionTime = std::numeric_limits<double>::max();
+    int totalFramesProcessed = 0;
+
+    void resetPerformanceMetrics(){
+	    totalDetectionTime = 0;
+	    maxDetectionTime = 0;
+	    minDetectionTime = std::numeric_limits<double>::max();
+	    totalFramesProcessed = 0;
+	}
+
+
 
 
 private:
@@ -27,6 +42,10 @@ private:
     std::thread detectionThread;
     bool running;
     float fdt=90;
+
+
+
+
     void detectionLoop();
     void detectFaces(cv::Mat& frame);
     cv::Rect getFaceRect(const float* detection, const cv::Mat& frame);
@@ -36,11 +55,11 @@ private:
     int skipRate = 3;
     
     // New members for performance metrics
-    double totalDetectionTime = 0;
-    int totalFramesProcessed = 0;
+
     std::chrono::high_resolution_clock::time_point lastTime;
     double fps = 0;
     void updatePerformanceMetrics(double detectionTime);
     void displayPerformanceMetrics(cv::Mat& frame);
+
 };
 

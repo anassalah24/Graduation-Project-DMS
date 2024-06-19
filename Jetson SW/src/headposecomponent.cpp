@@ -90,23 +90,25 @@ std::vector<std::vector<float>> HeadPoseComponent::detectHeadPose(cv::Mat& cropp
     auto headPoseResult = trt->inferHeadPose(croppedFace);
     auto endHeadPose = std::chrono::high_resolution_clock::now();
     double headPoseTime = std::chrono::duration_cast<std::chrono::milliseconds>(endHeadPose - startHeadPose).count();
-    headPoseTimes.push_back(headPoseTime);
-    maxHeadPoseTime = std::max(maxHeadPoseTime, headPoseTime);
-    minHeadPoseTime = std::min(minHeadPoseTime, headPoseTime);
-    totalHeadPoseTime += headPoseTime;
-    headPoseCount++;
-
+	if(headPoseTime>30){
+		headPoseTimes.push_back(headPoseTime);
+		maxHeadPoseTime = std::max(maxHeadPoseTime, headPoseTime);
+		minHeadPoseTime = std::min(minHeadPoseTime, headPoseTime);
+		totalHeadPoseTime += headPoseTime;
+		headPoseCount++;
+	}
     // Measure eyegaze engine inference time
     auto startEyeGaze = std::chrono::high_resolution_clock::now();
     auto eyeGazeResult = trt->inferEyeGaze(croppedFace);
     auto endEyeGaze = std::chrono::high_resolution_clock::now();
     double eyeGazeTime = std::chrono::duration_cast<std::chrono::milliseconds>(endEyeGaze - startEyeGaze).count();
-    eyeGazeTimes.push_back(eyeGazeTime);
-    maxEyeGazeTime = std::max(maxEyeGazeTime, eyeGazeTime);
-    minEyeGazeTime = std::min(minEyeGazeTime, eyeGazeTime);
-    totalEyeGazeTime += eyeGazeTime;
-    eyeGazeCount++;
-
+	if (eyeGazeTime>30){
+		eyeGazeTimes.push_back(eyeGazeTime);
+		maxEyeGazeTime = std::max(maxEyeGazeTime, eyeGazeTime);
+		minEyeGazeTime = std::min(minEyeGazeTime, eyeGazeTime);
+		totalEyeGazeTime += eyeGazeTime;
+		eyeGazeCount++;
+	}
     std::vector<std::vector<float>> out{headPoseResult, eyeGazeResult};
     return out;
 }
@@ -199,6 +201,8 @@ void HeadPoseComponent::logPerformanceMetrics() {
 
     double averageHeadPoseTime = headPoseCount > 0 ? totalHeadPoseTime / headPoseCount : 0;
     double averageEyeGazeTime = eyeGazeCount > 0 ? totalEyeGazeTime / eyeGazeCount : 0;
+	if (minHeadPoseTime == std::numeric_limits<double>::max()){minHeadPoseTime=0;}
+	if (minEyeGazeTime == std::numeric_limits<double>::max()){minEyeGazeTime=0;}
     logFile << "<<------------------------------------------------------------------->>\n";
     logFile << "Head Pose Engine Metrics:\n";
     logFile << "Max Time: " << maxHeadPoseTime << " ms\n";
@@ -227,6 +231,9 @@ void HeadPoseComponent::logPerformanceMetrics() {
     logFile << "Average CPU Usage for Eye Gaze: "
             << static_cast<double>(engine->geteyeGazeCpuUsage()) / engine->geteyeGazeInferenceCount() << " %\n";
     logFile << "<<------------------------------------------------------------------->>\n";
+
+
+	resetPerformanceMetrics();
 
     engine->resetPeakGpuMemoryUsage();
 

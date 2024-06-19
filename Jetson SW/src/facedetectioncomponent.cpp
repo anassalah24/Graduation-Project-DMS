@@ -1,5 +1,12 @@
 #include "facedetectioncomponent.h"
+#include <boost/filesystem.hpp> // For directory handling with Boost
+#include <boost/date_time/posix_time/posix_time.hpp> // For timestamps
+#include <boost/date_time/gregorian/gregorian.hpp>  // For to_iso_extended_string for dates
+#include <iomanip>  // For std::setw and std::setfill
 
+namespace fs = boost::filesystem;
+namespace pt = boost::posix_time;
+namespace gr = boost::gregorian;
 
 //constructor
 FaceDetectionComponent::FaceDetectionComponent(ThreadSafeQueue<cv::Mat>& inputQueue, ThreadSafeQueue<cv::Mat>& outputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
@@ -60,13 +67,14 @@ void FaceDetectionComponent::detectionLoop() {
 	       outputQueue.push(frame); // Pass the complete frame with the bounding box
 	       continue;
 	    }
+            auto start = std::chrono::high_resolution_clock::now();
             detectFaces(frame);
             auto end = std::chrono::high_resolution_clock::now();
-    	    double yoloTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    	    double detectionTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
             std::cout << "YOLO time:" << std::endl;
-    	    std::cout << yoloTime << std::endl;
+    	    std::cout << detectionTime << std::endl;
             //double detectionTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-            //updatePerformanceMetrics(detectionTime);
+            updatePerformanceMetrics(detectionTime);
             //displayPerformanceMetrics(frame);
 
             //outputQueue.push(frame);
@@ -121,19 +129,15 @@ cv::Rect FaceDetectionComponent::getFaceRect(const float* detection, const cv::M
 }
 
 
+
 void FaceDetectionComponent::updatePerformanceMetrics(double detectionTime) {
     totalDetectionTime += detectionTime;
-    totalFramesProcessed++;
 
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    double timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastTime).count();
-
-    if (timeSinceLastUpdate >= 1000.0) { // Update FPS every second
-        fps = totalFramesProcessed / (timeSinceLastUpdate / 1000.0);
-        totalFramesProcessed = 0;
-        totalDetectionTime = 0;
-        lastTime = currentTime;
-    }
+	if (detectionTime>0){
+		totalFramesProcessed++;
+		maxDetectionTime = std::max(maxDetectionTime, detectionTime);
+		minDetectionTime = std::min(minDetectionTime, detectionTime);
+	}
 }
 
 void FaceDetectionComponent::displayPerformanceMetrics(cv::Mat& frame) {
@@ -152,5 +156,40 @@ void FaceDetectionComponent::setFDT(int fdt) {
     this->fdt = fdt;
     std::cout << "FDT CHANGED SUCCESSFULLY" << std::endl;
 }
+
+
+void FaceDetectionComponent::logPerformanceMetrics() {
+
+
+    // Ensure the directory exists
+    fs::path dir("benchmarklogs");
+    if (!fs::exists(dir)) {
+        fs::create_directory(dir);
+    }
+
+    // Get current time and format the filename
+    pt::ptime now = pt::second_clock::local_time();
+    std::ostringstream filename;
+    filename << dir.string() << "/benchmark_log_"
+             << gr::to_iso_extended_string(now.date()) << "_"  // Correctly use date to string conversion
+             << std::setw(2) << std::setfill('0') << now.time_of_day().hours() << "-"
+             << std::setw(2) << std::setfill('0') << now.time_of_day().minutes()
+             << ".txt";
+
+    // Open the log file in append mode
+    std::ofstream logFile(filename.str(), std::ios::app);
+
+    double averageDetectionTime = totalFramesProcessed > 0 ? totalDetectionTime / totalFramesProcessed : 0;
+	
+	if (minDetectionTime == std::numeric_limits<double>::max()){minDetectionTime=0;}
+    logFile << "Face Detection Metrics:\n";
+    logFile << "Max Detection Time: " << maxDetectionTime << " ms\n";
+    logFile << "Min Detection Time: " << minDetectionTime << " ms\n";
+    logFile << "Average Detection Time: " << averageDetectionTime << " ms\n";
+    resetPerformanceMetrics();
+    logFile << "<<------------------------------------------------------------------->>\n";
+    logFile.close();
+}
+
 
 
