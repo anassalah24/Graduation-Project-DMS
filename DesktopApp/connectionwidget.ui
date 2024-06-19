@@ -14,9 +14,24 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget{
-background-color:#404E5C;
-}</string>
+   <string notr="true">QWidget {
+    background-color: #404E5C;
+}
+
+QLineEdit#lineEdit1, QLineEdit#lineEdit2 {
+    border: 2px solid #4F6272;
+    border-radius: 20px;
+    color: white;
+    padding-left: 10px;
+    background-color: rgb(79, 98, 114);
+}
+QLineEdit#lineEdit1:hover, QLineEdit#lineEdit2:hover {
+    border: 2px solid #BFD7EA;
+}
+QLineEdit#lineEdit1:focus, QLineEdit#lineEdit2:focus {
+    border: 2px solid white;
+}
+</string>
   </property>
   <widget class="QLineEdit" name="ipLineEdit">
    <property name="geometry">

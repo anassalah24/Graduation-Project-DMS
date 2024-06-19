@@ -115,7 +115,7 @@ border: 2px solid white;
 }</string>
    </property>
    <property name="buttonSymbols">
-    <enum>QAbstractSpinBox::PlusMinus</enum>
+    <enum>QAbstractSpinBox::UpDownArrows</enum>
    </property>
    <property name="minimum">
     <number>1</number>
@@ -155,7 +155,7 @@ border: 2px solid white;
 }</string>
    </property>
    <property name="buttonSymbols">
-    <enum>QAbstractSpinBox::PlusMinus</enum>
+    <enum>QAbstractSpinBox::UpDownArrows</enum>
    </property>
    <property name="singleStep">
     <number>5</number>
@@ -207,7 +207,7 @@ border: 2px solid white;
    <property name="styleSheet">
     <string notr="true">QLineEdit{
 border: 2px solid #4F6272;
-border-radius:20px;
+
 color:white;
 padding-left:10px;
 	background-color: rgb(79, 98, 114);
@@ -223,7 +223,7 @@ border: 2px solid white;
   <widget class="QPushButton" name="applybutton">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>570</y>
      <width>181</width>
      <height>61</height>
@@ -233,7 +233,7 @@ border: 2px solid white;
     <string notr="true">QPushButton{
 background-color:#4F6272; 
 color:white;
-border-radius:20px;
+border-radius:1px;
 }
 
 QPushButton:Hover{
