@@ -18,6 +18,27 @@ public:
     void startServer();
     void stopServer();
 
+    size_t getTotalFrameDataSent() const { return totalFrameDataSent; }
+    size_t getTotalCommandDataSent() const { return totalCommandDataSent; }
+    size_t getTotalReadingsDataSent() const { return totalReadingsDataSent; }
+    size_t getFrameCount() const { return frameCount; }  // Add this line to retrieve the frame count
+    size_t getTransmissionErrors() const { return transmissionErrors; }
+
+
+
+    void resetDataTransferMetrics() {
+        totalFrameDataSent = 0;
+        totalCommandDataSent = 0;
+        totalReadingsDataSent = 0;
+        frameCount = 0;  // Add this line to reset the frame count
+        transmissionErrors = 0;
+
+
+    }
+
+    void logDataTransferMetrics();
+
+
 
 private:
     int port;
@@ -28,6 +49,14 @@ private:
     ThreadSafeQueue<std::vector<std::vector<float>>>& readingsQueue; 
     ThreadSafeQueue<std::string>& commandsQueue;  // Queue for processing commands
     ThreadSafeQueue<std::string>& faultsQueue;  // Queue for reporting faults
+
+    size_t totalFrameDataSent = 0;
+    size_t totalCommandDataSent = 0;
+    size_t totalReadingsDataSent = 0;
+    size_t frameCount = 0;  // Add this line to track the number of frames sent
+    size_t transmissionErrors = 0;
+
+
 
     // Separate server loops for frames and commands
     void frameServerLoop();  // Server loop for handling frame connections
