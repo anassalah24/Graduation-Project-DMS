@@ -89,6 +89,7 @@ void DMSManager::stopSystem() {
     // Log performance metrics
     headposeComponent.logPerformanceMetrics();
     tcpComponent.logDataTransferMetrics();
+    faceDetectionComponent.logPerformanceMetrics();
 
     cameraComponent.stopCapture();
     preprocessingComponent.stopProcessing();
