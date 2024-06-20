@@ -25,7 +25,7 @@ This application runs on a Jetson Nano board and is responsible for real-time de
 
 2. Set up the environment by running the setup script:
     ```bash
-    ./scripts/setup_environment.sh
+    setup_environment.sh
     ```
 
 4. Set up the environment as shown in the next section:
