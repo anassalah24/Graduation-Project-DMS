@@ -46,13 +46,11 @@ public:
     // Clear all items from the queue
     void clear() {
         std::unique_lock<std::mutex> lock(mtx);
-        while (!dataQueue.empty()) {
-            dataQueue.pop();
-        }
+        std::queue<T> emptyQueue;
+        std::swap(dataQueue, emptyQueue);
         // Optionally, notify all waiting threads that the state has changed
         condVar.notify_all();
     }
-
 
 private:
     mutable std::mutex mtx;

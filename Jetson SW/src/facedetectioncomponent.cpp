@@ -8,44 +8,45 @@ namespace fs = boost::filesystem;
 namespace pt = boost::posix_time;
 namespace gr = boost::gregorian;
 
-//constructor
-FaceDetectionComponent::FaceDetectionComponent(ThreadSafeQueue<cv::Mat>& inputQueue, ThreadSafeQueue<cv::Mat>& outputQueue,ThreadSafeQueue<cv::Rect>& faceRectQueue,ThreadSafeQueue<std::string>& commandsQueue,ThreadSafeQueue<std::string>& faultsQueue)
-: inputQueue(inputQueue), outputQueue(outputQueue), faceRectQueue(faceRectQueue), commandsQueue(commandsQueue),faultsQueue(faultsQueue), running(false) {}
+// Constructor
+FaceDetectionComponent::FaceDetectionComponent(ThreadSafeQueue<cv::Mat>& inputQueue, 
+                                               ThreadSafeQueue<cv::Mat>& outputQueue,
+                                               ThreadSafeQueue<cv::Rect>& faceRectQueue,
+                                               ThreadSafeQueue<std::string>& commandsQueue,
+                                               ThreadSafeQueue<std::string>& faultsQueue)
+    : inputQueue(inputQueue), outputQueue(outputQueue), faceRectQueue(faceRectQueue), 
+      commandsQueue(commandsQueue), faultsQueue(faultsQueue), running(false){}
 
-
-//destructor
+// Destructor
 FaceDetectionComponent::~FaceDetectionComponent() {
     stopDetection();
 }
 
-// initialize model , choose backend ( CUDA , OPENCV , OPENCL ) 
+// Initialize model, choose backend (CUDA, OPENCV, OPENCL)
 bool FaceDetectionComponent::initialize(const std::string& modelConfiguration, const std::string& modelWeights) {
     net = cv::dnn::readNetFromDarknet(modelConfiguration, modelWeights);
-    net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);// CUDA , OPENCV
-    net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);// DNN_TARGET_OPENCL , DNN_TARGET_CUDA , DNN_TARGET_CPU 
+    net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
+    net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
     if (net.empty()) {
         std::cerr << "Failed to load the model or config file." << std::endl;
         return false;
     }
-    std::string command = "Clear Queue";
-    commandsQueue.push(command);
+    commandsQueue.push("Clear Queue");
     return true;
 }
 
-
-// start detection loop in another thread
+// Start detection loop in another thread
 void FaceDetectionComponent::startDetection() {
     if (running) {
         std::cerr << "Detection is already running." << std::endl;
         return;
     }
     running = true;
-    std::string command = "Clear Queue";
-    commandsQueue.push(command);
+    commandsQueue.push("Clear Queue");
     detectionThread = std::thread(&FaceDetectionComponent::detectionLoop, this);
 }
 
-// release thread and any needed cleanup
+// Release thread and any needed cleanup
 void FaceDetectionComponent::stopDetection() {
     running = false;
     if (detectionThread.joinable()) {
@@ -54,40 +55,30 @@ void FaceDetectionComponent::stopDetection() {
 }
 
 
-// This loop takes frame from input queue , sends it to detect faces and places it into the output queue
 void FaceDetectionComponent::detectionLoop() {
     cv::Mat frame;
-    this->lastTime = std::chrono::high_resolution_clock::now(); // Initialize the last time
-    std::string command = "Clear Queue";
-    commandsQueue.push(command);
+    lastTime = std::chrono::high_resolution_clock::now();
+    commandsQueue.push("Clear Queue");
     while (running) {
         if (inputQueue.tryPop(frame)) {
-            auto start = std::chrono::high_resolution_clock::now();
-	    if (this->modelstatus==false){
-	       outputQueue.push(frame); // Pass the complete frame with the bounding box
-	       continue;
-	    }
+            if (!modelstatus) {
+                outputQueue.push(frame);
+                continue;
+            }
             auto start = std::chrono::high_resolution_clock::now();
             detectFaces(frame);
             auto end = std::chrono::high_resolution_clock::now();
-    	    double detectionTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-            std::cout << "YOLO time:" << std::endl;
-    	    std::cout << detectionTime << std::endl;
-            //double detectionTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+            double detectionTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
             updatePerformanceMetrics(detectionTime);
-            //displayPerformanceMetrics(frame);
-
-            //outputQueue.push(frame);
         }
     }
 }
-
 
 // Function to start the YOLO face detection and send the face with max confidence
 void FaceDetectionComponent::detectFaces(cv::Mat& frame) {
     cv::Mat blob;
     try {
-        cv::dnn::blobFromImage(frame, blob, 1/255.0, cv::Size(320, 320), cv::Scalar(0, 0, 0), true, false);
+        cv::dnn::blobFromImage(frame, blob, 1 / 255.0, cv::Size(320, 320), cv::Scalar(0, 0, 0), true, false);
         net.setInput(blob);
         std::vector<cv::Mat> outs;
         net.forward(outs, net.getUnconnectedOutLayersNames());
@@ -105,16 +96,15 @@ void FaceDetectionComponent::detectFaces(cv::Mat& frame) {
             }
         }
 
-        if (maxConf > static_cast<float>(this->fdt) / 100.0f) {
+        if (maxConf > static_cast<float>(fdt) / 100.0f) {
             cv::rectangle(frame, bestFaceRect, cv::Scalar(0, 255, 0), 2);
-	    faceRectQueue.push(bestFaceRect); // Push the bounding box coordinates
+            faceRectQueue.push(bestFaceRect); // Push the bounding box coordinates
         }
         outputQueue.push(frame); // Pass the complete frame with the bounding box
     } catch (const cv::Exception& e) {
         std::cerr << "OpenCV error: " << e.what() << std::endl;
     }
 }
-
 
 // Helper function to calculate the rectangle of the face from detection data
 cv::Rect FaceDetectionComponent::getFaceRect(const float* detection, const cv::Mat& frame) {
@@ -128,39 +118,27 @@ cv::Rect FaceDetectionComponent::getFaceRect(const float* detection, const cv::M
     return cv::Rect(left, top, width, height);
 }
 
-
-
 void FaceDetectionComponent::updatePerformanceMetrics(double detectionTime) {
     totalDetectionTime += detectionTime;
 
-	if (detectionTime>0){
-		totalFramesProcessed++;
-		maxDetectionTime = std::max(maxDetectionTime, detectionTime);
-		minDetectionTime = std::min(minDetectionTime, detectionTime);
-	}
+    if (detectionTime > 0) {
+        totalFramesProcessed++;
+        maxDetectionTime = std::max(maxDetectionTime, detectionTime);
+        minDetectionTime = std::min(minDetectionTime, detectionTime);
+    }
 }
 
 void FaceDetectionComponent::displayPerformanceMetrics(cv::Mat& frame) {
     std::string fpsText = "FPS: " + std::to_string(int(fps));
     std::string avgTimeText = "Avg Time: " + std::to_string(totalDetectionTime / totalFramesProcessed) + " ms";
-
-    //cv::putText(frame, fpsText, cv::Point(20, 40), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
-    //cv::putText(frame, avgTimeText, cv::Point(20, 80), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
-    //std::cout << fpsText << std::endl;
-    //std::cout << avgTimeText << std::endl;
 }
-
-
 
 void FaceDetectionComponent::setFDT(int fdt) {
     this->fdt = fdt;
     std::cout << "FDT CHANGED SUCCESSFULLY" << std::endl;
 }
 
-
 void FaceDetectionComponent::logPerformanceMetrics() {
-
-
     // Ensure the directory exists
     fs::path dir("benchmarklogs");
     if (!fs::exists(dir)) {
@@ -171,7 +149,7 @@ void FaceDetectionComponent::logPerformanceMetrics() {
     pt::ptime now = pt::second_clock::local_time();
     std::ostringstream filename;
     filename << dir.string() << "/benchmark_log_"
-             << gr::to_iso_extended_string(now.date()) << "_"  // Correctly use date to string conversion
+             << gr::to_iso_extended_string(now.date()) << "_"
              << std::setw(2) << std::setfill('0') << now.time_of_day().hours() << "-"
              << std::setw(2) << std::setfill('0') << now.time_of_day().minutes()
              << ".txt";
@@ -180,8 +158,9 @@ void FaceDetectionComponent::logPerformanceMetrics() {
     std::ofstream logFile(filename.str(), std::ios::app);
 
     double averageDetectionTime = totalFramesProcessed > 0 ? totalDetectionTime / totalFramesProcessed : 0;
-	
-	if (minDetectionTime == std::numeric_limits<double>::max()){minDetectionTime=0;}
+    if (minDetectionTime == std::numeric_limits<double>::max()) {
+        minDetectionTime = 0;
+    }
     logFile << "Face Detection Metrics:\n";
     logFile << "Max Detection Time: " << maxDetectionTime << " ms\n";
     logFile << "Min Detection Time: " << minDetectionTime << " ms\n";
@@ -191,5 +170,11 @@ void FaceDetectionComponent::logPerformanceMetrics() {
     logFile.close();
 }
 
+void FaceDetectionComponent::resetPerformanceMetrics() {
+    totalDetectionTime = 0.0;
+    totalFramesProcessed = 0;
+    maxDetectionTime = 0.0;
+    minDetectionTime = std::numeric_limits<double>::max();
+}
 
 
