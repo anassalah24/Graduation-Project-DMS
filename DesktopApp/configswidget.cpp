@@ -1,13 +1,12 @@
 #include "configswidget.h"
 #include "ui_configswidget.h"
 
-
-ConfigsWidget::ConfigsWidget(DataHandler *dataHandler, ConnectionWidget *connectionWidget,SystemControl *systemControl,QWidget *parent)
+ConfigsWidget::ConfigsWidget(DataHandler *dataHandler, ConnectionWidget *connectionWidget, SystemControl *systemControl, QWidget *parent)
     : QWidget(parent),
     ui(new Ui::ConfigsWidget),
     dataHandler(dataHandler),
     connectionWidget(connectionWidget),
-    systemControl (systemControl)
+    systemControl(systemControl)
 {
     ui->setupUi(this);
 
@@ -20,8 +19,8 @@ ConfigsWidget::ConfigsWidget(DataHandler *dataHandler, ConnectionWidget *connect
     ui->label_video->setVisible(false);
 
     // Connect the combo box signal to the slot
-    connect(ui->source_combo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &ConfigsWidget::onCaptureSourceChanged);
+    connect(ui->source_combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ConfigsWidget::onCaptureSourceChanged);
+
     // Connect the apply changes button to the slot
     connect(ui->applybutton, &QPushButton::clicked, this, &ConfigsWidget::onApplyChangesClicked);
 }
@@ -31,16 +30,13 @@ ConfigsWidget::~ConfigsWidget()
     delete ui;
 }
 
-
 void ConfigsWidget::onCaptureSourceChanged(int index) {
     if (ui->source_combo->currentText() == "Video") {
         ui->videoname->setVisible(true);
         ui->label_video->setVisible(true);
-
     } else {
         ui->videoname->setVisible(false);
         ui->label_video->setVisible(false);
-
     }
 }
 
@@ -53,6 +49,7 @@ void ConfigsWidget::onApplyChangesClicked() {
         QMessageBox::warning(this, "System Status", "The system is currently off. Please turn it on before proceeding.");
         return;
     }
+
     // Retrieve values from UI components
     int fps = ui->fps_spin->value();
     int fdt = ui->fdt_spin->value();
@@ -67,7 +64,7 @@ void ConfigsWidget::onApplyChangesClicked() {
     // Construct configuration messages
     QString fpsMessage = "SET_FPS:" + QString::number(fps);
     QString fdtMessage = "SET_FDT:" + QString::number(fdt);
-    QString sourceMessage = "SET_SOURCE:"+source;
+    QString sourceMessage = "SET_SOURCE:" + source;
 
     // Convert messages to QByteArray
     QByteArray fpsData = fpsMessage.toUtf8();
