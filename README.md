@@ -16,7 +16,7 @@ The Driver Monitoring System is designed to enhance road safety by detecting and
 
 ## Installation
 ### Prerequisites
-- Jetson Nano board with JetPack SDK (4.2.6)
+- Jetson Nano board with JetPack SDK (4.6.4)
 - Windows PC (with QT installed)
 - Required libraries and dependencies (listed in each application's README)
 
