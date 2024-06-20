@@ -44,6 +44,7 @@ This application runs on a Windows PC and connects to the Jetson Nano applicatio
 1. Ensure the Jetson Nano application is running and connected to the same network as the Windows PC.
 2. Launch the compiled application from Qt Creator or directly from the build directory.
 3. Enter IP(depending on the network) and port (12345) of the jetson board to connect to it and view live feed and start configuring the system remotely.
+   
 
 
 
