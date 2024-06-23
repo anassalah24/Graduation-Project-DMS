@@ -34,7 +34,7 @@ private:
     cv::VideoCapture cap; // OpenCV video capture object
     std::thread captureThread; // Thread for capturing video
     bool running; // Flag to indicate if capturing is running
-    int fps; // Frames per second for capturing
+    int fps = 20; // Frames per second for capturing
     ThreadSafeQueue<cv::Mat>& outputQueue; // Queue for output frames
     ThreadSafeQueue<std::string>& commandsQueue; // Queue for commands
     ThreadSafeQueue<std::string>& faultsQueue; // Queue for faults

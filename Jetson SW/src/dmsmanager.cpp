@@ -148,12 +148,12 @@ void DMSManager::handleCommand(std::string& command) {
         {"eff1", "/home/dms/DMS/ModularCode/include/eff1.engine"},
         {"eff2", "/home/dms/DMS/ModularCode/include/eff2.engine"},
         {"eff3", "/home/dms/DMS/ModularCode/include/eff3.engine"},
-        {"whenNet", "/home/dms/DMS/ModularCode/include/whenNet.engine"},
+        {"whenNet", "/home/dms/DMS/ModularCode/include/gayarNet.engine"},
         {"No Head Pose", "No Head Pose"}
     };
 
     std::map<std::string, std::string> eyeGazeModels = {
-        {"mobilenetv3", "/home/dms/DMS/ModularCode/modelconfigs/mobilenetv3_engine.engine"},
+        {"mobilenetv3", "/home/dms/DMS/ModularCode/include/mobileNetNew.engine"},
         {"squeezenet", "/home/dms/DMS/ModularCode/modelconfigs/squeezenet.engine"},
         {"resnet", "/home/dms/DMS/ModularCode/include/resnet_engine.engine"},
         {"mobilenet", "/home/dms/DMS/ModularCode/include/mobilenet_engine.engine"},

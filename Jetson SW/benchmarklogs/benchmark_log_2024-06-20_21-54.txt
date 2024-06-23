@@ -1,0 +1,30 @@
+<<------------------------------------------------------------------->>
+Head Pose Engine Metrics:
+Max Time: 0 ms
+Min Time: 0 ms
+Average Time: 0 ms
+
+Eye Gaze Engine Metrics:
+Max Time: 35354 ms
+Min Time: 58 ms
+Average Time: 121.178 ms
+
+Peak GPU Memory Usage for Head Pose: 0 MB
+Peak GPU Memory Usage for Eye Gaze: 1.75922e+13 MB
+Average CPU Memory Usage for Head Pose: nan MB
+Average CPU Memory Usage for Eye Gaze: 0.230738 MB
+Average CPU Usage for Head Pose: nan %
+Average CPU Usage for Eye Gaze: 99.9976 %
+<<------------------------------------------------------------------->>
+TCP Data Transfer Metrics:
+Total Frame Data Sent: 237 MB
+Average Frame Size Sent: 72.8112 KB
+Total Command Data Received: 0 KB
+Total Readings Data Sent: 295 KB
+Transmission Errors: 0
+<<------------------------------------------------------------------->>
+Face Detection Metrics:
+Max Detection Time: 0 ms
+Min Detection Time: 0 ms
+Average Detection Time: 0 ms
+<<------------------------------------------------------------------->>

@@ -40,7 +40,7 @@ void BasicCameraComponent::stopCapture() {
 
 // Main loop that captures frame from camera or video file
 void BasicCameraComponent::captureLoop() {
-    fps = 60;
+    //fps = 60;
     while (running) {
         int delay = 1000 / fps;
         auto start = std::chrono::steady_clock::now();
@@ -52,13 +52,14 @@ void BasicCameraComponent::captureLoop() {
             break;
         }
         
+
         if (!frame.empty()) {
 
-            int width = frame.cols;
-            int height = frame.rows;
-            size_t totalElements = frame.total();
-            int dataTypeSize = frame.elemSize();  
-            size_t frameSize = totalElements * dataTypeSize;
+            //int width = frame.cols;
+            //int height = frame.rows;
+            //size_t totalElements = frame.total();
+            //int dataTypeSize = frame.elemSize();  
+            //size_t frameSize = totalElements * dataTypeSize;
 
             outputQueue.push(frame);
         }
@@ -69,6 +70,7 @@ void BasicCameraComponent::captureLoop() {
 
         if (elapsed < delay) {
             std::this_thread::sleep_for(std::chrono::milliseconds(delay - elapsed));
+    	    std::cout << "SLEPTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" << std::endl;
         }
     }
     running = false;
@@ -83,6 +85,7 @@ void BasicCameraComponent::setFPS(int fps) {
 // Set the source and restart capture
 void BasicCameraComponent::setSource(const std::string& source) {
     stopCapture();
+    cap.release() ;
     if (!cap.open(source)) {
         std::cerr << "Failed to change source: " << source << std::endl;
     } else {

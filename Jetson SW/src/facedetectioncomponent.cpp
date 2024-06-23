@@ -1,8 +1,9 @@
 #include "facedetectioncomponent.h"
-#include <boost/filesystem.hpp> // For directory handling with Boost
-#include <boost/date_time/posix_time/posix_time.hpp> // For timestamps
-#include <boost/date_time/gregorian/gregorian.hpp>  // For to_iso_extended_string for dates
-#include <iomanip>  // For std::setw and std::setfill
+#include <boost/filesystem.hpp> 
+#include <boost/date_time/posix_time/posix_time.hpp> 
+#include <boost/date_time/gregorian/gregorian.hpp> 
+#include <iomanip> 
+
 
 namespace fs = boost::filesystem;
 namespace pt = boost::posix_time;
@@ -22,6 +23,7 @@ FaceDetectionComponent::~FaceDetectionComponent() {
     stopDetection();
 }
 
+
 // Initialize model, choose backend (CUDA, OPENCV, OPENCL)
 bool FaceDetectionComponent::initialize(const std::string& modelConfiguration, const std::string& modelWeights) {
     net = cv::dnn::readNetFromDarknet(modelConfiguration, modelWeights);
@@ -34,6 +36,7 @@ bool FaceDetectionComponent::initialize(const std::string& modelConfiguration, c
     commandsQueue.push("Clear Queue");
     return true;
 }
+
 
 // Start detection loop in another thread
 void FaceDetectionComponent::startDetection() {
@@ -53,7 +56,6 @@ void FaceDetectionComponent::stopDetection() {
         detectionThread.join();
     }
 }
-
 
 void FaceDetectionComponent::detectionLoop() {
     cv::Mat frame;
@@ -176,5 +178,6 @@ void FaceDetectionComponent::resetPerformanceMetrics() {
     maxDetectionTime = 0.0;
     minDetectionTime = std::numeric_limits<double>::max();
 }
+
 
 

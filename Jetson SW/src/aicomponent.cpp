@@ -27,6 +27,7 @@ AIComponent::~AIComponent() {
 }
 
 
+
 // Start detection loop in another thread
 void AIComponent::startAIDetection() {
     if (running) {
@@ -83,16 +84,22 @@ std::vector<std::vector<float>> AIComponent::detectAI(cv::Mat& croppedFace) {
     auto headPoseResult = trt->inferHeadPose(croppedFace);
     auto endHeadPose = std::chrono::high_resolution_clock::now();
     double headPoseTime = std::chrono::duration_cast<std::chrono::milliseconds>(endHeadPose - startHeadPose).count();
-    if (headPoseTime > 30) {
+    if (headPoseTime > 45) {
         headPoseTimes.push_back(headPoseTime);
         maxHeadPoseTime = std::max(maxHeadPoseTime, headPoseTime);
         minHeadPoseTime = std::min(minHeadPoseTime, headPoseTime);
         totalHeadPoseTime += headPoseTime;
         headPoseCount++;
     }
+    
 
+    // Crop the upper 55% of the image
+    int newHeight = static_cast<int>(croppedFace.rows * 0.55);
+    cv::Rect roi(0, 0, croppedFace.cols, newHeight);
+    cv::Mat upperCroppedFace = croppedFace(roi);
+   
     auto startEyeGaze = std::chrono::high_resolution_clock::now();
-    auto eyeGazeResult = trt->inferEyeGaze(croppedFace);
+    auto eyeGazeResult = trt->inferEyeGaze(upperCroppedFace);
     auto endEyeGaze = std::chrono::high_resolution_clock::now();
     double eyeGazeTime = std::chrono::duration_cast<std::chrono::milliseconds>(endEyeGaze - startEyeGaze).count();
     if (eyeGazeTime > 30) {

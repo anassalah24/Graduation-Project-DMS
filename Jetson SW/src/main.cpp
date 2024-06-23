@@ -24,7 +24,7 @@ int main() {
                           commandsQueue, faultsQueue);
 
     // Initialize the camera component
-    if (!dmsManager.initializeCamera("/dev/video0")) { // use /dev/video0 for camera or /path/to/video/file
+    if (!dmsManager.initializeCamera("/home/dms/DMS/Videos/rearview 5.mp4")) { // use /dev/video0 for camera or /path/to/video/file
         std::cerr << "Failed to initialize camera component." << std::endl;
         return -1;
     }
