@@ -7,11 +7,7 @@
 #include "connectionwidget.h"
 #include "ui_systemcontrol.h"
 
-#define SET_FD_MODEL_BASE      (0x3)  // Base value for face detection model commands
-#define SET_HP_MODEL_BASE      (0x4)  // Base value for head pose model commands
-#define SET_EG_MODEL_BASE      (0x5)  // Base value for eye gaze model commands
-#define TURN_ON_COMMAND        (0x12)
-#define TURN_OFF_COMMAND       (0x22)
+
 
 namespace Ui {
 class SystemControl;
