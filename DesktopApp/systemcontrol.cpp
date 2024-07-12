@@ -47,84 +47,30 @@ void SystemControl::onSendButtonClicked() {
     QString headPoseModel = ui->comboHeadPose->currentText();
     QString eyeGazeModel = ui->comboEyeGaze->currentText();
 
-    // Construct hex commands based on selected models
-    unsigned char fdCommand = 0x00; // Initialize to zero for face detection
-    if (faceDetectionModel == "YoloV3 Tiny") {
-        fdCommand = 0x01; // YoloV3 Tiny
-    }
-    else if (faceDetectionModel == "YoloV2") {
-        fdCommand = 0x02; // YoloV2
-    }
-    else {
-        fdCommand = 0x00; // No Face Detection
-    }
-    fdCommand |= SET_FD_MODEL_BASE; // Set the base value (0x3)
+    // Construct configuration messages
+    QString faceDetectionMessage = "SET_FD_MODEL:" + faceDetectionModel;
+    QString headPoseMessage = "SET_HP_MODEL:" + headPoseModel;
+    QString eyeGazeMessage = "SET_EG_MODEL:" + eyeGazeModel;
 
-    // Construct head pose command
-    unsigned char hpCommand = 0x00; // Initialize to zero for head pose
-    if (headPoseModel == "AX") {
-        hpCommand = 0x01; // AX
-    }
-    else if (headPoseModel == "AY") {
-        hpCommand = 0x02; // AY
-    }
-    else if (headPoseModel == "AZ") {
-        hpCommand = 0x03; // AZ
-    }
-    else if (headPoseModel == "A0") {
-        hpCommand = 0x04; // A0
-    }
-    else if (headPoseModel == "eff0") {
-        hpCommand = 0x05; // eff0
-    }
-    else if (headPoseModel == "eff1") {
-        hpCommand = 0x06; // eff1
-    }
-    else if (headPoseModel == "eff2") {
-        hpCommand = 0x07; // eff2
-    }
-    else if (headPoseModel == "eff3") {
-        hpCommand = 0x08; // eff3
-    }
-    else {
-        hpCommand = 0x09; // No Head Pose
-    }
-    hpCommand |= SET_HP_MODEL_BASE; // Set the base value (0x4)
+    // Convert messages to QByteArray
+    QByteArray fdData = faceDetectionMessage.toUtf8();
+    QByteArray hpData = headPoseMessage.toUtf8();
+    QByteArray egData = eyeGazeMessage.toUtf8();
 
-    // Construct eye gaze command
-    unsigned char egCommand = 0x00; // Initialize to zero for eye gaze
-    if (eyeGazeModel == "mobilenetv3") {
-        egCommand = 0x01; // mobilenetv3
-    }
-    else if (eyeGazeModel == "squeezenet") {
-        egCommand = 0x02; // squeezenet
-    }
-    else if (eyeGazeModel == "resnet") {
-        egCommand = 0x03; // resnet
-    }
-    else if (eyeGazeModel == "mobilenet") {
-        egCommand = 0x04; // mobilenet
-    }
-    else {
-        egCommand = 0x05; // No Eye Gaze
-    }
-    egCommand |= SET_EG_MODEL_BASE; // Set the base value (0x5)
+    // Prefix each message with its length
+    int fdSize = fdData.size();
+    fdData.prepend(reinterpret_cast<const char*>(&fdSize), sizeof(int));
 
-    // Create QByteArrays for hex commands
-    QByteArray fdData;
-    fdData.append(fdCommand);
+    int hpSize = hpData.size();
+    hpData.prepend(reinterpret_cast<const char*>(&hpSize), sizeof(int));
 
-    QByteArray hpData;
-    hpData.append(hpCommand);
-
-    QByteArray egData;
-    egData.append(egCommand);
+    int egSize = egData.size();
+    egData.prepend(reinterpret_cast<const char*>(&egSize), sizeof(int));
 
     // Use DataHandler to send the messages
     dataHandler->sendData(fdData);
     dataHandler->sendData(hpData);
     dataHandler->sendData(egData);
-
 }
 
 
@@ -134,9 +80,12 @@ void SystemControl::onSystemOnClicked() {
         QMessageBox::warning(this, "Connection Error", "The system is disconnected. Please connect before proceeding.");
         return;
     }
-    unsigned char message = TURN_ON_COMMAND;
-    QByteArray data;
-    data.append(message);
+    QString message = "TURN_ON";
+    QByteArray data = message.toUtf8();
+
+    // Prefix the message with its length
+    int messageSize = data.size();
+    data.prepend(reinterpret_cast<const char*>(&messageSize), sizeof(int));
 
     dataHandler->sendData(data);
     systemStatus = true;
@@ -148,12 +97,14 @@ void SystemControl::onSystemOffClicked() {
         return;
     }
 
-    unsigned char message = TURN_OFF_COMMAND;
-    QByteArray data;
-    data.append(message);
+    QString message = "TURN_OFF";
+    QByteArray data = message.toUtf8();
+
+    // Prefix the message with its length
+    int messageSize = data.size();
+    data.prepend(reinterpret_cast<const char*>(&messageSize), sizeof(int));
 
     dataHandler->sendData(data);
     systemStatus = false;
 }
-
 
