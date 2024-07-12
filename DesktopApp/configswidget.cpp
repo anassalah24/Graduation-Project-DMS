@@ -61,31 +61,28 @@ void ConfigsWidget::onApplyChangesClicked() {
         source = "video:" + ui->videoname->text();
     }
 
-    // Define command codes
-    const int SET_FPS = 0x0000;
-    const int SET_FDT = 0x0001;
-
-    // Create byte arrays to hold the messages
-    QByteArray fpsMessage;
-    QByteArray fdtMessage;
+    // Construct configuration messages
+    QString fpsMessage = "SET_FPS:" + QString::number(fps);
+    QString fdtMessage = "SET_FDT:" + QString::number(fdt);
     QString sourceMessage = "SET_SOURCE:" + source;
+
+    // Convert messages to QByteArray
+    QByteArray fpsData = fpsMessage.toUtf8();
+    QByteArray fdtData = fdtMessage.toUtf8();
     QByteArray sourceData = sourceMessage.toUtf8();
 
-    // Create combined FPS command and value
-    int fpsValue = (fps & 0xFF) << 4 | SET_FPS; // Combine value and command
-    fpsMessage.append(reinterpret_cast<const char*>(&fpsValue), sizeof(fpsValue));
+    // Prefix each message with its length
+    int fpsSize = fpsData.size();
+    fpsData.prepend(reinterpret_cast<const char*>(&fpsSize), sizeof(int));
 
-    // Create combined FDT command and value
-    int fdtValue = (fdt & 0xFF) << 4 | SET_FDT; // Combine value and command
-    fdtMessage.append(reinterpret_cast<const char*>(&fdtValue), sizeof(fdtValue));
+    int fdtSize = fdtData.size();
+    fdtData.prepend(reinterpret_cast<const char*>(&fdtSize), sizeof(int));
 
-    // Prefix source message with its length
     int sourceSize = sourceData.size();
     sourceData.prepend(reinterpret_cast<const char*>(&sourceSize), sizeof(int));
 
     // Use DataHandler to send the messages
-    dataHandler->sendData(fpsMessage);
-    dataHandler->sendData(fdtMessage);
+    dataHandler->sendData(fpsData);
+    dataHandler->sendData(fdtData);
     dataHandler->sendData(sourceData);
 }
-
