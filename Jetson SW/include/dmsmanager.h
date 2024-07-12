@@ -8,53 +8,7 @@
 #include "aicomponent.h"
 #include "commtcpcomponent.h"
 
-#define COMMANDS_NUM        10
-typedef unsigned char  Std_ReturnType;
-#define E_OK            ((Std_ReturnType)0x00U)      /* Function Return OK */
-#define E_NOT_OK        ((Std_ReturnType)0x01U)      /* Function Return NOT OK */
 
-#define TURN_SYSTEM_ON      (0x1)
-#define TURN_SYSTEM_OFF     (0x2)
-
-typedef enum
-{
-    SET_FPS,
-    SET_FDT,
-    TURN_SYSTEM,
-    SET_FD_MODEL,
-    SET_HP_MODEL,
-    SET_EG_MODEL,
-}COMMANDS;
-
-typedef enum
-{
-    AX,
-    AY,
-    AZ,
-    A0,
-    eff0,
-    eff1,
-    eff2,
-    eff3,
-    whenNet,
-    NoHeadPose
-}HEADPOSE_MODELS;
-
-typedef enum
-{
-    mobilenetv3,
-    squeezenet,
-    resnet,
-    mobilenet,
-    NoEyeGaze
-}EYEGAZE_MODELS;
-
-typedef enum
-{
-    YoloV3Tiny,
-    YoloV2,
-    NoFaceDetection
-}FACEDETECTION_MODELS;
 
 
 class DMSManager {
@@ -76,14 +30,6 @@ public:
     void setCamereSource(const std::string& source);
     void clearQueues();
     void setupSignalHandlers();
-
-    Std_ReturnType setFPS(unsigned short command);
-    Std_ReturnType setFDT(unsigned short command);
-    Std_ReturnType turnSystem(unsigned short command);
-    Std_ReturnType setFDmodel(unsigned short command);
-    Std_ReturnType setHPmodel(unsigned short command);
-    Std_ReturnType setEGmodel(unsigned short command);
-    Std_ReturnType setSource(const std::string& command);
 
     // Function to handle the different types of commands 
     void handleCommand(std::string& command);
