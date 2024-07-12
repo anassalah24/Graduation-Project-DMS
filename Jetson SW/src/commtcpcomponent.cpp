@@ -199,8 +199,50 @@ void CommTCPComponent::handleCommandClient(int clientSocket) {
                     ptr += messageLength;
 
                     // Process the message
-                    commandsQueue.push(message);
-                    
+                    if (message.find("SET_FPS") != std::string::npos) {
+                        // Handle FPS configuration
+                        std::cout << "Received SET_FPS command with value: " << message.substr(8) << std::endl;
+                        std::string command = "SET_FPS:" + message.substr(8);
+                        commandsQueue.push(command);
+                    } else if (message == "TURN_OFF") {
+                        // Handle turning off the system
+                        std::cout << "Received TURN_OFF command" << std::endl;
+                        std::string command = "TURN_OFF";
+                        commandsQueue.push(command);
+                    } else if (message == "TURN_ON") {
+                        // Handle turning on the system
+                        std::cout << "Received TURN_ON command" << std::endl;
+                        std::string command = "TURN_ON";
+                        commandsQueue.push(command);
+                    } else if (message.find("SET_FDT") != std::string::npos) {
+                        // Handle FDT configuration
+                        std::cout << "Received SET_FDT command with value: " << message.substr(8) << std::endl;
+                        std::string command = "SET_FDT:" + message.substr(8);
+                        commandsQueue.push(command);
+                    } else if (message.find("SET_SOURCE") != std::string::npos) {
+                        // Handle source configuration
+                        std::cout << "Received SET_SOURCE command with value: " << message.substr(11) << std::endl;
+                        std::string command = "SET_SOURCE:" + message.substr(11);
+                        commandsQueue.push(command);
+                        // Handle Face Detction Model
+                    } else if (message.find("SET_FD_MODEL") != std::string::npos) {
+                        std::string command = "Clear Queue";
+                        commandsQueue.push(command);
+                        std::cout << "Received SET_FD_MODEL command with value: " << message.substr(13) << std::endl;
+                        commandsQueue.push("SET_FD_MODEL:" + message.substr(13));
+                        // Handle Head Pose Model
+                    } else if (message.find("SET_HP_MODEL") != std::string::npos) {
+                        std::cout << "Received SET_HP_MODEL command with value: " << message.substr(13) << std::endl;
+                        commandsQueue.push("SET_HP_MODEL:" + message.substr(13));
+                        // Handle Eye Gaze Model
+                    } else if (message.find("SET_EG_MODEL") != std::string::npos) {
+                        std::string command = "Clear Queue";
+                        commandsQueue.push(command);
+                        std::cout << "Received SET_EG_MODEL command with value: " << message.substr(13) << std::endl;
+                        commandsQueue.push("SET_EG_MODEL:" + message.substr(13));
+                    } else {
+                        std::cout << "Received unknown command: " << message << std::endl;
+                    }
                 }
             }
         }

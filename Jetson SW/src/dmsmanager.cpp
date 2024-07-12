@@ -1,8 +1,6 @@
 #include "dmsmanager.h"
 #include <benchmark/benchmark.h>
 
-Std_ReturnType (*func_ptrs[COMMANDS_NUM])(unsigned short)={NULL};
-
 // Constructor: passes input and output queues for different components
 DMSManager::DMSManager(ThreadSafeQueue<cv::Mat>& cameraQueue, 
                        ThreadSafeQueue<cv::Mat>& faceDetectionQueue, 
@@ -27,16 +25,7 @@ DMSManager::DMSManager(ThreadSafeQueue<cv::Mat>& cameraQueue,
       commandsQueue(commandsQueue),
       faultsQueue(faultsQueue),
       running(false), 
-      firstRun(true) 
-      {
-        func_ptrs[SET_FPS]      = &DMSManager::setFPS;
-        func_ptrs[SET_FDT]      = &DMSManager::setFDT;
-        func_ptrs[TURN_SYSTEM]  = &DMSManager::turnSystem;
-        func_ptrs[SET_FD_MODEL] = &DMSManager::setFDmodel;
-        func_ptrs[SET_HP_MODEL] = &DMSManager::setHPmodel;
-        func_ptrs[SET_EG_MODEL] = &DMSManager::setEGmodel;
-        func_ptrs[SET_SOURCE]   = &DMSManager::setSource;
-      }
+      firstRun(true) {}
 
 // Destructor (cleanup)
 DMSManager::~DMSManager() {
@@ -150,227 +139,164 @@ void DMSManager::clearQueues(){
 void DMSManager::handleCommand(std::string& command) {
     clearQueues();
     //model paths
-    std::map<HEADPOSE_MODELS, std::string> headPoseModels = {
-        {AX, "/home/dms/DMS/ModularCode/include/Ax.engine"},
-        {AY, "/home/dms/DMS/ModularCode/include/Ay.engine"},
-        {AZ, "/home/dms/DMS/ModularCode/include/Az.engine"},
-        {A0, "/home/dms/DMS/ModularCode/include/A0.engine"},
-        {eff0, "/home/dms/DMS/ModularCode/include/eff0.engine"},
-        {eff1, "/home/dms/DMS/ModularCode/include/eff1.engine"},
-        {eff2, "/home/dms/DMS/ModularCode/include/eff2.engine"},
-        {eff3, "/home/dms/DMS/ModularCode/include/eff3.engine"},
-        {whenNet, "/home/dms/DMS/ModularCode/include/gayarNet.engine"},
-        {NoHeadPose, "No Head Pose"}
+    std::map<std::string, std::string> headPoseModels = {
+        {"AX", "/home/dms/DMS/ModularCode/include/Ax.engine"},
+        {"AY", "/home/dms/DMS/ModularCode/include/Ay.engine"},
+        {"AZ", "/home/dms/DMS/ModularCode/include/Az.engine"},
+        {"A0", "/home/dms/DMS/ModularCode/include/A0.engine"},
+        {"eff0", "/home/dms/DMS/ModularCode/include/eff0.engine"},
+        {"eff1", "/home/dms/DMS/ModularCode/include/eff1.engine"},
+        {"eff2", "/home/dms/DMS/ModularCode/include/eff2.engine"},
+        {"eff3", "/home/dms/DMS/ModularCode/include/eff3.engine"},
+        {"whenNet", "/home/dms/DMS/ModularCode/include/gayarNet.engine"},
+        {"No Head Pose", "No Head Pose"}
     };
 
-    std::map<EYEGAZE_MODELS, std::string> eyeGazeModels = {
-        {mobilenetv3, "/home/dms/DMS/ModularCode/include/mobileNetNew.engine"},
-        {squeezenet, "/home/dms/DMS/ModularCode/modelconfigs/squeezenet.engine"},
-        {resnet, "/home/dms/DMS/ModularCode/include/resnet_engine.engine"},
-        {mobilenet, "/home/dms/DMS/ModularCode/include/mobilenet_engine.engine"},
-        {NoEyeGaze, "No Eye Gaze"}
+    std::map<std::string, std::string> eyeGazeModels = {
+        {"mobilenetv3", "/home/dms/DMS/ModularCode/include/mobileNetNew.engine"},
+        {"squeezenet", "/home/dms/DMS/ModularCode/modelconfigs/squeezenet.engine"},
+        {"resnet", "/home/dms/DMS/ModularCode/include/resnet_engine.engine"},
+        {"mobilenet", "/home/dms/DMS/ModularCode/include/mobilenet_engine.engine"},
+        {"No Eye Gaze", "No Eye Gaze"}
     };
 
-    std::map<FACEDETECTION_MODELS, std::pair<std::string, std::string>> faceDetectionModels = {
-        {YoloV3Tiny, {"/home/dms/DMS/ModularCode/modelconfigs/face-yolov3-tiny.cfg", "/home/dms/DMS/ModularCode/modelconfigs/face-yolov3-tiny_41000.weights"}},
-        {YoloV2, {"/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.weights"}},
-        {NoFaceDetection, {"No Face Detection", "No Face Detection"}}
+    std::map<std::string, std::pair<std::string, std::string>> faceDetectionModels = {
+        {"YoloV3 Tiny", {"/home/dms/DMS/ModularCode/modelconfigs/face-yolov3-tiny.cfg", "/home/dms/DMS/ModularCode/modelconfigs/face-yolov3-tiny_41000.weights"}},
+        {"YoloV2", {"/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.cfg", "/home/dms/DMS/ModularCode/modelconfigs/yoloface-500k-v2.weights"}},
+        {"No Face Detection", {"No Face Detection", "No Face Detection"}}
+
     };
 
-    if (command.starts_with("SET_SOURCE:")) 
-    {
-        // Handle the SET_SOURCE command as a string
-        setSource(command);
-    } 
-    else if (command == "Clear Queue") {
-        // Handle the Clear Queue command as a string
-        clearQueue();
-    }
-    else
-    {
-        unsigned short cmd = *reinterpret_cast<const unsigned short*>(command.data()); //treats the pointer to the string data as a pointer to an unsigned short
-        //reads the first two bytes of the string data as an unsigned short value, effectively converting the string data to a hex command.
-        
-        unsigned short func_to_call = cmd & 0x000F; //extract the last 4 bits
-        // Check if func_to_call is within the bounds of the array
-        
-        if (func_to_call < COMMANDS_NUM && func_ptrs[func_to_call] != NULL)
-        {
-            // Call the function and get the output
-            Std_ReturnType output = func_ptrs[func_to_call](cmd);
-            if(output == E_NOT_OK)
-            {
-                std::cout << "Something went wrong with the command\n" << std::endl;
-            }
-            else
-            {
-                //do nth
-            }
-        }
-        else
-        {
-            std::cerr << "Unknown command: " << command << std::endl;
+    // Setting FPS
+    if (command.find("SET_FPS:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string fpsValueStr = command.substr(pos + 1);
+            int fpsValue = std::stoi(fpsValueStr);
+            std::cout << "Setting FPS to: " << fpsValue << std::endl;
+            setCameraFPS(fpsValue);
+        } else {
+            std::cerr << "Invalid SETFPS command format: " << command << std::endl;
         }
     }
-}
-
-Std_ReturnType DMSManager::setFPS(command)
-{
-    unsigned short fpsValue= (command >> 4) & (0x00FF);
-    if(fpsValue>=0 && fpsValue<=100)
-    {
-        std::cout << "Setting FPS to: " << fpsValue << std::endl;
-        setCameraFPS(fpsValue);
-        return E_OK;
+    // Setting face detection threshold
+    else if (command.find("SET_FDT:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string fdtValueStr = command.substr(pos + 1);
+            int fdtValue = std::stoi(fdtValueStr);
+            std::cout << "Setting Face Detection Threshold to: " << fdtValue << std::endl;
+            setFaceFDT(fdtValue);
+        } else {
+            std::cerr << "Invalid SETFDT command format: " << command << std::endl;
+        }
     }
-    else
-    {
-        std::cerr << "Invalid SETFPS command format: " << command << std::endl;
-        return E_NOT_OK;
+    // Setting source
+    else if (command.find("SET_SOURCE:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string sourceStr = command.substr(pos + 1);
+            if (sourceStr == "camera") {
+                sourceStr = "/dev/video0";  // or the appropriate camera source for your system
+            } else if (sourceStr.find("video:") == 0) {
+                std::string videoName = sourceStr.substr(6);  // Extract the video name after "video:"
+                sourceStr = "/home/dms/DMS/Videos/" + videoName;  // Construct the full path to the video file
+            } else {
+                std::cerr << "Invalid source value: " << sourceStr << std::endl;
+                return;
+            }
+            std::cout << "Setting Source to: " << sourceStr << std::endl;
+            setCamereSource(sourceStr);
+        } else {
+            std::cerr << "Invalid SET_SOURCE command format: " << command << std::endl;
+        }
     }
-}
-
-Std_ReturnType DMSManager::setFDT(command)
-{
-    unsigned short fdtValue= (command >> 4) & (0x00FF);
-    if(fdtValue>=0 && fdtValue<=100)
-    {
-        std::cout << "Setting FDT to: " << fdtValue << std::endl;
-        setFaceFDT(fdtValue);
-        return E_OK;
-    }
-    else
-    {
-        std::cerr << "Invalid SETFDT command format: " << command << std::endl;
-        return E_NOT_OK;
-    }
-}
-
-
-Std_ReturnType DMSManager::turnSystem(command)
-{
-    unsigned short system = (command >> 4) & (0x00FF);
-    if (system == TURN_SYSTEM_ON)
-    {
-        std::cout << "Turning on..." << std::endl;
-        startSystem();
-        return E_OK;
-    }
-    else if (system == TURN_SYSTEM_OFF)
-    {
+    // Turning off the system
+    else if (command == "TURN_OFF") {
         std::cout << "Turning off..." << std::endl;
         stopSystem();
-        return E_OK
     }
-    else
-    {
-        return E_NOT_OK;
+    // Turning on the system
+    else if (command == "TURN_ON") {
+        std::cout << "Turning on..." << std::endl;
+        startSystem();
     }
-    
-}
-
-Std_ReturnType DMSManager::setFDmodel(command)
-{
-    unsigned short modelValue = (command >> 4) & (0x00FF);
-    auto it = faceDetectionModels.find(modelValue);
-    if (it != faceDetectionModels.end()) 
-    {
-        std::string weightPath = it->second.second;
-        std::string configPath = it->second.first;
-        if (weightPath == "No Face Detection" && configPath == "No Face Detection") 
-        {
-            faceDetectionComponent.modelstatus = false;
-            std::cout << "Updated Face Detection Model and Config to: " << weightPath << " and " << configPath << std::endl;
-            clearQueues();
-        } 
-        else 
-        {
-            faceDetectionComponent.stopDetection();
-            faceDetectionComponent.initialize(configPath, weightPath);
-            faceDetectionComponent.modelstatus = true;
-            faceDetectionComponent.startDetection();
-            std::cout << "Updated Face Detection Model and Config to: " << weightPath << " and " << configPath << std::endl;
-            clearQueues();
+    // Clear Queue
+    else if (command == "Clear Queue") {
+        clearQueues();
+    }
+    // Handling Face Detection Model
+    else if (command.find("SET_FD_MODEL:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string modelValue = command.substr(pos + 1);
+            std::cout << "Setting Face Detection Model to: " << modelValue << std::endl;
+            auto it = faceDetectionModels.find(modelValue);
+            if (it != faceDetectionModels.end()) {
+                std::string weightPath = it->second.second;
+                std::string configPath = it->second.first;
+                if (weightPath == "No Face Detection" && configPath == "No Face Detection") {
+                    faceDetectionComponent.modelstatus = false;
+                    std::cout << "Updated Face Detection Model and Config to: " << weightPath << " and " << configPath << std::endl;
+                    clearQueues();
+                } else {
+                    faceDetectionComponent.stopDetection();
+                    faceDetectionComponent.initialize(configPath, weightPath);
+                    faceDetectionComponent.modelstatus = true;
+                    faceDetectionComponent.startDetection();
+                    std::cout << "Updated Face Detection Model and Config to: " << weightPath << " and " << configPath << std::endl;
+                    clearQueues();
+                }
+            } else {
+                std::cerr << "Face detection model identifier not recognized: " << modelValue << std::endl;
+            }
+        } else {
+            std::cerr << "Invalid SET_FD_MODEL command format: " << command << std::endl;
         }
-        return E_OK;
-    } 
-    else 
-    {
-        std::cerr << "Face detection model identifier not recognized: " << modelValue << std::endl;
-        return E_NOT_OK;
     }
-}
-
-Std_ReturnType DMSManager::setHPmodel(command)
-{
-    unsigned short modelValue = (command >> 4) & (0x00FF);
-    std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
-    if (headPoseModels.find(modelValue) != headPoseModels.end()) 
-    {
-        clearQueues();
-        AiComponent.updateHeadPoseEngine(headPoseModels[modelValue]);
-        clearQueues();
-        return E_OK;
-    } 
-    else 
-    {
-        std::cerr << "Head pose model identifier not recognized: " << modelValue << std::endl;
-        return E_NOT_OK;
-    }
-}
-
-Std_ReturnType DMSManager::setEGmodel(command)
-{
-    unsigned short modelValue = (command >> 4) & (0x00FF);
-    std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
-    if (eyeGazeModels.find(modelValue) != eyeGazeModels.end()) 
-    {
-        clearQueues();
-        AiComponent.updateEyeGazeEngine(eyeGazeModels[modelValue]);
-        clearQueues();
-        return E_OK;
-    } 
-    else 
-    {
-        std::cerr << "Eye gaze model identifier not recognized: " << modelValue << std::endl;
-        return E_NOT_OK;
-    }
-}
-
-Std_ReturnType DMSManager::setSource(command)
-{
-    // Setting source
-    size_t pos = command.find(":");
-    if (pos != std::string::npos) 
-    {
-        std::string sourceStr = command.substr(pos + 1);
-        if (sourceStr == "camera") 
-        {
-            sourceStr = "/dev/video0";  // or the appropriate camera source for your system
-        } 
-        else if (sourceStr.find("video:") == 0) 
-        {
-            std::string videoName = sourceStr.substr(6);  // Extract the video name after "video:"
-            sourceStr = "/home/dms/DMS/Videos/" + videoName;  // Construct the full path to the video file
-        } 
-        else 
-        {
-            std::cerr << "Invalid source value: " << sourceStr << std::endl;
-            return E_NOT_OK;
+    // Handling Head Pose Model
+    else if (command.find("SET_HP_MODEL:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string modelValue = command.substr(pos + 1);
+            std::cout << "Setting Head Pose Model to: " << modelValue << std::endl;
+            if (headPoseModels.find(modelValue) != headPoseModels.end()) {
+                clearQueues();
+                AiComponent.updateHeadPoseEngine(headPoseModels[modelValue]);
+                clearQueues();
+            } else {
+                std::cerr << "Head pose model identifier not recognized: " << modelValue << std::endl;
+            }
+        } else {
+            std::cerr << "Invalid SET_HP_MODEL command format: " << command << std::endl;
         }
-        std::cout << "Setting Source to: " << sourceStr << std::endl;
-        setCamereSource(sourceStr);
-        return E_OK;
-    } 
-    else 
-    {
-        std::cerr << "Invalid SET_SOURCE command format: " << command << std::endl;
-        return E_NOT_OK;
     }
-    
+    // Handling Eye Gaze Model
+    else if (command.find("SET_EG_MODEL:") != std::string::npos) {
+        size_t pos = command.find(":");
+        if (pos != std::string::npos) {
+            std::string modelValue = command.substr(pos + 1);
+            std::cout << "Setting Eye Gaze Model to: " << modelValue << std::endl;
+            if (eyeGazeModels.find(modelValue) != eyeGazeModels.end()) {
+                clearQueues();
+                AiComponent.updateEyeGazeEngine(eyeGazeModels[modelValue]);
+                clearQueues();
+            } else {
+                std::cerr << "Eye gaze model identifier not recognized: " << modelValue << std::endl;
+            }
+        } else {
+            std::cerr << "Invalid SET_EG_MODEL command format: " << command << std::endl;
+        }
+    } else {
+        std::cerr << "Unknown command: " << command << std::endl;
+    }
 }
 
 // Initialization functions needed for some components
 bool DMSManager::initializeCamera(const std::string& source) {
     return cameraComponent.initialize(source);
 }
+
+
+
+
